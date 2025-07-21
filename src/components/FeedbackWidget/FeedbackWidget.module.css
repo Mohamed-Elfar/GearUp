@@ -13,24 +13,26 @@
 }
 
 .feedbackBtn {
-  background: var(--color-primary-500);
-  color: var(--color-pure-white);
+  background: #374151; /* gray-700 */
+  color: white;
   border: none;
-  padding: 12px 8px;
+  padding: 8px 16px;
   font-size: 14px;
   font-weight: 600;
-  writing-mode: vertical-rl;
-  text-orientation: mixed;
+  cursor: pointer;
   border-top-left-radius: 10px;
   border-top-right-radius: 10px;
-  cursor: pointer;
   transition: all 0.3s ease;
-  letter-spacing: 1px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+    0 4px 6px -2px rgba(0, 0, 0, 0.05);
 }
 
 .feedbackBtn:hover {
-  background: var(--color-secondary-500);
-  transform: scale(1.05);
+  background: #1f2937; /* gray-800 */
+  transform: scale(1.02);
 }
 
 .feedbackPanel {

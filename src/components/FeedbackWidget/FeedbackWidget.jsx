@@ -2,7 +2,7 @@
 import React, { useState, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { useLanguage } from "../../hooks/useLanguage";
-
+import Styles from "./FeedbackWidget.module.css";
 export default function FeedbackWidget() {
   const { t } = useTranslation();
   const { language } = useLanguage();
@@ -120,7 +120,7 @@ export default function FeedbackWidget() {
       <div className="fixed bottom-0 sm:left-8 md:left-16 z-50 ">
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="feedbackBtn bg-gray-700 text-white px-4 py-2 rounded-t-lg shadow-lg hover:bg-gray-800 transition-colors flex items-center gap-2"
+          className={Styles.feedbackBtn}
         >
           <span>💬</span>
           <span className="font-medium">{t("feedback.button")}</span>

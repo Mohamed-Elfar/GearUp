@@ -65,47 +65,17 @@ nav > div {
   section {
     margin: 30px 2rem !important;
   }
-
-  .stateNumber {
-    font-size: 40px;
-    font-weight: 800;
-  }
-
-  .statLabel {
-    font-size: 16px;
-    font-weight: 600;
-  }
 }
 
 @media (min-width: 768px) {
   section {
     margin: 35px 3rem !important;
   }
-
-  .stateNumber {
-    font-size: 50px;
-    font-weight: 900;
-  }
-
-  .statLabel {
-    font-size: 18px;
-    font-weight: 600;
-  }
 }
 
 @media (min-width: 1024px) {
   section {
     margin: 40px 5rem !important;
-  }
-
-  .stateNumber {
-    font-size: 40px;
-    font-weight: 900;
-  }
-
-  .statLabel {
-    font-size: 20px;
-    font-weight: 600;
   }
 }
 
