@@ -1,0 +1,72 @@
+/* General utility styles and layouts */
+.learningCardButton {
+  margin-top: 2rem !important;
+}
+
+.btnHoverPrimary:hover {
+  background-color: var(--color-primary-600) !important;
+  color: white !important;
+  border-color: var(--color-primary-600) !important;
+}
+
+.stats {
+  padding: 30px 0;
+}
+
+.imgBg {
+  background-color: var(--color-primary-100);
+  padding: 20px;
+  border-radius: 50%;
+  width: 100px;
+  height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stateNumber {
+  font-size: 32px;
+  font-weight: 700;
+}
+
+.statLabel {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* Responsive Stats */
+@media (max-width: 639px) {
+  .stateNumber {
+    font-size: 24px;
+    font-weight: 600;
+  }
+
+  .statLabel {
+    font-size: 12px;
+    font-weight: 500;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .stateNumber {
+    font-size: 28px;
+    font-weight: 650;
+  }
+
+  .statLabel {
+    font-size: 13px;
+    font-weight: 500;
+  }
+}
+
+@media (min-width: 1024px) {
+  .stateNumber {
+    font-size: 36px;
+    font-weight: 600;
+  }
+
+  .statLabel {
+    font-size: 15px;
+    font-weight: 600;
+  }
+}

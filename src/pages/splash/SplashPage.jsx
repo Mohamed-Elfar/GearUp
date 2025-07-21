@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import logoImage from "../../assets/logo.png";
-import "./SplashPage.css";
+import styles from "./SplashPage.module.css";
 
 export default function SplashPage() {
   const navigate = useNavigate();
@@ -17,22 +17,28 @@ export default function SplashPage() {
   }, [navigate]);
 
   return (
-    <div className="splash-container">
-      <div className="splash-content">
+    <div className={styles.splashContainer}>
+      <div className={styles.splashContent}>
         {/* Spinning Logo */}
-        <div className="logo-container">
-          <img src={logoImage} alt="GearUp Logo" className="spinning-logo" />
+        <div className={styles.logoContainer}>
+          <img
+            src={logoImage}
+            alt="GearUp Logo"
+            className={styles.spinningLogo}
+          />
         </div>
 
         {/* Company Name */}
-        <div className="company-info">
-          <h1 className="company-name">GearUp</h1>
-          <p className="company-tagline">Transforming Vision into Reality</p>
+        <div className={styles.companyInfo}>
+          <h1 className={styles.companyName}>GearUp</h1>
+          <p className={styles.companyTagline}>
+            Transforming Vision into Reality
+          </p>
 
           {/* Loading Animation */}
-          <div className="loading-animation">
-            <div className="loading-bar">
-              <div className="loading-progress"></div>
+          <div className={styles.loadingAnimation}>
+            <div className={styles.loadingBar}>
+              <div className={styles.loadingProgress}></div>
             </div>
           </div>
         </div>

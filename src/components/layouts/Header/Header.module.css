@@ -1,0 +1,169 @@
+/* Header Layout Component Styles */
+.header {
+  background: var(--color-dark-navy);
+  color: var(--color-pure-white);
+  padding: 16px 0;
+  border-bottom: 1px solid var(--color-neutral-700);
+}
+
+.headerContainer {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  color: inherit;
+}
+
+.logoImage {
+  height: 40px;
+  width: auto;
+}
+
+.logoText {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--color-pure-white);
+}
+
+.navigation {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+}
+
+.navList {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.navItem {
+  position: relative;
+}
+
+.navLink {
+  color: var(--color-pure-white);
+  text-decoration: none;
+  font-weight: 500;
+  padding: 8px 0;
+  transition: color 0.3s ease;
+  position: relative;
+}
+
+.navLink:hover {
+  color: var(--color-secondary-500);
+}
+
+.navLink.active {
+  color: var(--color-primary-500);
+}
+
+.navLink.active::after {
+  content: "";
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--color-primary-500);
+}
+
+.userActions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.mobileMenuButton {
+  display: none;
+  background: none;
+  border: none;
+  color: var(--color-pure-white);
+  font-size: 24px;
+  cursor: pointer;
+  padding: 8px;
+}
+
+.mobileMenu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: var(--color-dark-navy);
+  border-top: 1px solid var(--color-neutral-700);
+  padding: 16px 24px;
+  display: none;
+}
+
+.mobileMenuOpen .mobileMenu {
+  display: block;
+}
+
+.mobileNavList {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.mobileUserActions {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--color-neutral-700);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .navigation {
+    gap: 24px;
+  }
+
+  .navList {
+    gap: 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .headerContainer {
+    padding: 0 16px;
+  }
+
+  .navigation {
+    display: none;
+  }
+
+  .mobileMenuButton {
+    display: block;
+  }
+
+  .userActions {
+    gap: 12px;
+  }
+}
+
+@media (max-width: 640px) {
+  .logoText {
+    font-size: 20px;
+  }
+
+  .logoImage {
+    height: 32px;
+  }
+}

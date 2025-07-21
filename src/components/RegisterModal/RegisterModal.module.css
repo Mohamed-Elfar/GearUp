@@ -1,0 +1,99 @@
+/* RegisterModal Module Styles - Extends LoginModal styles */
+@import "../LoginModal/LoginModal.module.css";
+
+.modalDialog {
+  max-width: 480px;
+}
+
+.formRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.passwordStrength {
+  margin-top: 8px;
+}
+
+.strengthMeter {
+  height: 4px;
+  background: var(--color-neutral-200);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.strengthBar {
+  height: 100%;
+  transition: all 0.3s ease;
+}
+
+.strengthWeak {
+  width: 33%;
+  background: var(--color-error);
+}
+
+.strengthMedium {
+  width: 66%;
+  background: #ffa500;
+}
+
+.strengthStrong {
+  width: 100%;
+  background: var(--color-success);
+}
+
+.strengthText {
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.strengthWeak + .strengthText {
+  color: var(--color-error);
+}
+
+.strengthMedium + .strengthText {
+  color: #ffa500;
+}
+
+.strengthStrong + .strengthText {
+  color: var(--color-success);
+}
+
+.termsCheckbox {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin: 16px 0;
+}
+
+.termsCheckbox input {
+  margin-top: 2px;
+}
+
+.termsText {
+  font-size: 13px;
+  color: var(--color-neutral-600);
+  line-height: 1.4;
+}
+
+.termsLink {
+  color: var(--color-primary-500);
+  text-decoration: none;
+}
+
+.termsLink:hover {
+  text-decoration: underline;
+}
+
+/* Mobile adjustments for register form */
+@media (max-width: 640px) {
+  .formRow {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .modalDialog {
+    max-width: none;
+  }
+}

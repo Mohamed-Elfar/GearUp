@@ -37,52 +37,20 @@ a:active {
   color: inherit;
 }
 
+/* Global layout styles */
 section {
   margin: 40px 5rem;
 }
+
 nav {
   place-items: center;
 }
+
 nav > div {
   width: 100%;
   padding: 0 6rem;
 }
-.learning-card-button {
-  margin-top: 2rem !important;
-}
-.btn-hover-primary:hover {
-  background-color: var(--color-primary-600) !important;
-  color: white !important;
-  border-color: var(--color-primary-600) !important;
-}
-.stats {
-  padding: 30px 0;
-}
-
-.imgBg {
-  background-color: var(--color-primary-100);
-  padding: 20px;
-  border-radius: 50%;
-  width: 100px;
-  height: 100px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.stateNumber {
-  font-size: 32px;
-  font-weight: 700;
-}
-
-.statLabel {
-  font-size: 14px;
-  font-weight: 500;
-}
-.feedbackBtn {
-  border-top-left-radius: 10px;
-  border-top-right-radius: 10px;
-}
+/* Component-specific utility classes - move these to respective component modules */
 /* Responsive Styles - Mobile First */
 @media (max-width: 639px) {
   section {

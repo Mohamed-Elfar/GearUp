@@ -1,0 +1,119 @@
+/* FeedbackWidget Module Styles */
+.feedbackWidget {
+  position: fixed;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 1000;
+  background: var(--color-dark-navy);
+  border: 1px solid var(--color-neutral-500);
+  border-right: none;
+  border-radius: 8px 0 0 8px;
+  box-shadow: -2px 0 10px rgba(0, 0, 0, 0.3);
+}
+
+.feedbackBtn {
+  background: var(--color-primary-500);
+  color: var(--color-pure-white);
+  border: none;
+  padding: 12px 8px;
+  font-size: 14px;
+  font-weight: 600;
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  letter-spacing: 1px;
+}
+
+.feedbackBtn:hover {
+  background: var(--color-secondary-500);
+  transform: scale(1.05);
+}
+
+.feedbackPanel {
+  background: var(--color-dark-navy);
+  padding: 20px;
+  width: 300px;
+  max-height: 400px;
+  overflow-y: auto;
+  border-left: 3px solid var(--color-primary-500);
+}
+
+.feedbackTitle {
+  color: var(--color-pure-white);
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+.feedbackForm {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.feedbackTextarea {
+  background: var(--color-jet-black);
+  border: 1px solid var(--color-neutral-500);
+  color: var(--color-pure-white);
+  padding: 10px;
+  border-radius: 6px;
+  resize: vertical;
+  min-height: 100px;
+  font-family: inherit;
+}
+
+.feedbackTextarea:focus {
+  outline: none;
+  border-color: var(--color-primary-500);
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.feedbackTextarea::placeholder {
+  color: var(--color-neutral-500);
+}
+
+.feedbackSubmitBtn {
+  background: var(--color-primary-500);
+  color: var(--color-pure-white);
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.feedbackSubmitBtn:hover {
+  background: var(--color-secondary-500);
+}
+
+.feedbackSubmitBtn:disabled {
+  background: var(--color-neutral-600);
+  cursor: not-allowed;
+}
+
+.closeBtn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  color: var(--color-neutral-500);
+  font-size: 20px;
+  cursor: pointer;
+  padding: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.closeBtn:hover {
+  color: var(--color-pure-white);
+}
