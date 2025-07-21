@@ -1,0 +1,86 @@
+{
+  "header": {
+    "title": "مرحبًا",
+    "learning": "التعلم",
+    "forLearners": "للمتعلمين",
+    "embeddedSystems": "الأنظمة المدمجة",
+    "softwareTesting": "اختبار البرمجيات",
+    "mobileDevelopment": "تطوير التطبيقات المحمولة",
+    "webDevelopment": "تطوير الويب",
+    "cloudDevops": "الحوسبة السحابية و DevOps",
+    "aiDataScience": "الذكاء الاصطناعي وعلوم البيانات",
+    "cybersecurity": "الأمن السيبراني"
+  },
+  "navbar": {
+    "learning": "التعلم",
+    "hireGraduates": "وظف خريجينا",
+    "partnership": "سبرينتس × مايكروسوفت",
+    "login": "تسجيل الدخول",
+    "joinUs": "انضم إلينا"
+  },
+  "login": {
+    "title": "تسجيل الدخول إلى حسابك",
+    "google": "جوجل",
+    "github": "جيت هاب",
+    "linkedin": "لينكد إن",
+    "or": "أو",
+    "email": "البريد الإلكتروني",
+    "emailPlaceholder": "أدخل بريدك الإلكتروني",
+    "password": "كلمة المرور",
+    "passwordPlaceholder": "أدخل كلمة المرور",
+    "loginButton": "تسجيل الدخول",
+    "forgotPassword": "نسيت كلمة المرور؟",
+    "noAccount": "ليس لديك حساب؟",
+    "joinUs": "انضم إلينا"
+  },
+  "register": {
+    "title": "انضم إلينا",
+    "google": "جوجل",
+    "github": "جيت هاب",
+    "linkedin": "لينكد إن",
+    "or": "أو",
+    "email": "البريد الإلكتروني",
+    "emailPlaceholder": "أدخل بريدك الإلكتروني",
+    "agreeToTerms": "أوافق على",
+    "termsAndConditions": "الشروط والأحكام",
+    "joinUsButton": "انضم إلينا",
+    "alreadyHaveAccount": "هل لديك حساب بالفعل؟",
+    "login": "تسجيل الدخول"
+  },
+  "footer": {
+    "contactUs": "تواصل معنا",
+    "company": { "Company": "الشركة" },
+    "ourServices": { "Our Services": "خدماتنا" },
+    "training": { "Training": "التدريب" }
+  },
+  "feedback": {
+    "button": "ملاحظات",
+    "title": "إرسال ملاحظات",
+    "idea": {
+      "title": "أفكار / ميزة",
+      "description": "شاركنا أفكارك"
+    },
+    "issue": {
+      "title": "مشكلة / خطأ",
+      "description": "الإبلاغ عن مشكلة"
+    },
+    "form": {
+      "fullName": "الاسم الكامل",
+      "email": "البريد الإلكتروني",
+      "title": "العنوان",
+      "details": "شاركنا تفاصيل أكثر",
+      "screenshot": "لقطة شاشة",
+      "upload": "رفع ملف (2 ميجا)",
+      "submit": "إرسال"
+    },
+    "screenshotPermission": {
+      "title": "السماح لـ GearUp برؤية هذا التبويب؟",
+      "description": "سيكون بإمكان الموقع رؤية محتويات هذا التبويب",
+      "cancel": "إلغاء",
+      "allow": "السماح"
+    },
+    "files": {
+      "screenshot": "لقطة-شاشة.png"
+    }
+  }
+}

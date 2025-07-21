@@ -1,0 +1,205 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap");
+@import "tailwindcss";
+
+:root {
+  font-family: "Poppins", ui-sans-serif, system-ui, sans-serif,
+    Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol, Noto Color Emoji;
+}
+/*
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: light dark;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #242424;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+} */
+
+@layer base {
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    scroll-behavior: smooth;
+  }
+}
+
+/* Remove default link styling for NavLink components */
+a,
+a:visited,
+a:hover,
+a:active {
+  text-decoration: none !important;
+  color: inherit;
+}
+
+section {
+  margin: 40px 5rem;
+}
+nav {
+  place-items: center;
+}
+nav > div {
+  width: 100%;
+  padding: 0 6rem;
+}
+.learning-card-button {
+  margin-top: 2rem !important;
+}
+.btn-hover-primary:hover {
+  background-color: var(--color-primary-600) !important;
+  color: white !important;
+  border-color: var(--color-primary-600) !important;
+}
+.stats {
+  padding: 30px 0;
+}
+
+.imgBg {
+  background-color: var(--color-primary-100);
+  padding: 20px;
+  border-radius: 50%;
+  width: 100px;
+  height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stateNumber {
+  font-size: 32px;
+  font-weight: 700;
+}
+
+.statLabel {
+  font-size: 14px;
+  font-weight: 500;
+}
+.feedbackBtn {
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+}
+/* Responsive Styles - Mobile First */
+@media (max-width: 639px) {
+  section {
+    margin: 20px 1rem !important;
+  }
+  nav > div {
+    padding: 0 2rem;
+  }
+}
+
+@media (min-width: 640px) {
+  section {
+    margin: 30px 2rem !important;
+  }
+
+  .stateNumber {
+    font-size: 40px;
+    font-weight: 800;
+  }
+
+  .statLabel {
+    font-size: 16px;
+    font-weight: 600;
+  }
+}
+
+@media (min-width: 768px) {
+  section {
+    margin: 35px 3rem !important;
+  }
+
+  .stateNumber {
+    font-size: 50px;
+    font-weight: 900;
+  }
+
+  .statLabel {
+    font-size: 18px;
+    font-weight: 600;
+  }
+}
+
+@media (min-width: 1024px) {
+  section {
+    margin: 40px 5rem !important;
+  }
+
+  .stateNumber {
+    font-size: 40px;
+    font-weight: 900;
+  }
+
+  .statLabel {
+    font-size: 20px;
+    font-weight: 600;
+  }
+}
+
+/* Customized thems */
+
+@theme {
+  --font-display: "Poppins", "sans-serif";
+
+  /* GearUp Color Palette */
+  /* Primary Blue (#007BFF) */
+  --color-primary-50: #e6f3ff;
+  --color-primary-100: #cce7ff;
+  --color-primary-200: #99cfff;
+  --color-primary-300: #66b7ff;
+  --color-primary-400: #339fff;
+  --color-primary-500: #007bff; /* Primary Blue */
+  --color-primary-600: #0056cc;
+  --color-primary-700: #004199;
+  --color-primary-800: #002b66;
+  --color-primary-900: #001533;
+
+  /* Accent Blue (#00AEEF) */
+  --color-secondary-50: #e6f8ff;
+  --color-secondary-100: #ccf1ff;
+  --color-secondary-200: #99e3ff;
+  --color-secondary-300: #66d5ff;
+  --color-secondary-400: #33c7ff;
+  --color-secondary-500: #00aeef; /* Accent Blue */
+  --color-secondary-600: #008bc4;
+  --color-secondary-700: #006899;
+  --color-secondary-800: #00456e;
+  --color-secondary-900: #002243;
+
+  /* Metallic Silver (#C0C0C0) */
+  --color-neutral-50: #f7f7f7;
+  --color-neutral-100: #eeeeee;
+  --color-neutral-200: #dedede;
+  --color-neutral-300: #cdcdcd;
+  --color-neutral-400: #bcbcbc;
+  --color-neutral-500: #c0c0c0; /* Metallic Silver */
+  --color-neutral-600: #9a9a9a;
+  --color-neutral-700: #737373;
+  --color-neutral-800: #4d4d4d;
+  --color-neutral-900: #262626;
+
+  /* Dark Navy (#0A0F1C) */
+  --color-dark-navy: #0a0f1c;
+
+  /* Soft Gray (#E0E0E0) */
+  --color-soft-gray: #e0e0e0;
+
+  /* Jet Black (#101010) */
+  --color-jet-black: #101010;
+
+  /* Pure colors */
+  --color-pure-white: #ffffff;
+  --color-pure-black: #000000;
+
+  /* Footer color */
+  --color-pure-turquoise: #0a0f1c; /* Dark Navy for footer */
+
+  /* Easing */
+  --ease-fluid: cubic-bezier(0.3, 0, 0, 1);
+  --ease-snappy: cubic-bezier(0.2, 0, 0, 1);
+}

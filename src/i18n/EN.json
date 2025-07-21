@@ -1,0 +1,87 @@
+{
+  "header": {
+    "title": "Learning That Works, Employment That Fits",
+    "learning": "Learning",
+    "forLearners": "For Learners",
+    "embeddedSystems": "Embedded Systems",
+    "softwareTesting": "Software Testing",
+    "mobileDevelopment": "Mobile Development",
+    "webDevelopment": "Web Development",
+    "cloudDevops": "Cloud DevOps",
+    "aiDataScience": "AI & Data Science",
+    "cybersecurity": "Cybersecurity"
+  },
+
+  "navbar": {
+    "learning": "Learning",
+    "hireGraduates": "Hire Our Graduates",
+    "partnership": "Sprints X Microsoft",
+    "login": "Login",
+    "joinUs": "Join Us"
+  },
+  "login": {
+    "title": "Log in to your account",
+    "google": "Google",
+    "github": "Github",
+    "linkedin": "LinkedIn",
+    "or": "or",
+    "email": "Email",
+    "emailPlaceholder": "Enter your email",
+    "password": "Password",
+    "passwordPlaceholder": "Enter your password",
+    "loginButton": "Login",
+    "forgotPassword": "Forgot your password?",
+    "noAccount": "Don't have an account?",
+    "joinUs": "Join Us"
+  },
+  "register": {
+    "title": "Join Us",
+    "google": "Google",
+    "github": "Github",
+    "linkedin": "LinkedIn",
+    "or": "or",
+    "email": "Email",
+    "emailPlaceholder": "Enter your email",
+    "agreeToTerms": "I agree to the",
+    "termsAndConditions": "terms and conditions",
+    "joinUsButton": "Join Us",
+    "alreadyHaveAccount": "Already have an account?",
+    "login": "Login"
+  },
+  "footer": {
+    "contactUs": "Contact Us",
+    "company": { "Company": "Company" },
+    "ourServices": { "Our Services": "Our Services" },
+    "training": { "Training": "Training" }
+  },
+  "feedback": {
+    "button": "Feedback",
+    "title": "Send feedback",
+    "idea": {
+      "title": "Ideas / Feature",
+      "description": "Share your ideas with us"
+    },
+    "issue": {
+      "title": "Issue/Bug",
+      "description": "Report a problem"
+    },
+    "form": {
+      "fullName": "Full name",
+      "email": "Email",
+      "title": "Title",
+      "details": "Share us more details",
+      "screenshot": "Screenshot",
+      "upload": "Upload (2MB)",
+      "submit": "Submit"
+    },
+    "screenshotPermission": {
+      "title": "Allow GearUp to see this tab?",
+      "description": "The site will be able to see the contents of this tab",
+      "cancel": "Cancel",
+      "allow": "Allow"
+    },
+    "files": {
+      "screenshot": "screenshot.png"
+    }
+  }
+}

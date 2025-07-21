@@ -1,0 +1,28 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Government Building -->
+  <rect x="8" y="24" width="48" height="28" rx="2" fill="#F3E5F5" stroke="#9C27B0" stroke-width="2"/>
+  
+  <!-- Columns -->
+  <rect x="12" y="20" width="4" height="32" fill="#9C27B0"/>
+  <rect x="20" y="20" width="4" height="32" fill="#9C27B0"/>
+  <rect x="28" y="20" width="4" height="32" fill="#9C27B0"/>
+  <rect x="36" y="20" width="4" height="32" fill="#9C27B0"/>
+  <rect x="44" y="20" width="4" height="32" fill="#9C27B0"/>
+  <rect x="52" y="20" width="4" height="32" fill="#9C27B0"/>
+  
+  <!-- Roof/Top -->
+  <polygon points="4,20 32,8 60,20" fill="#9C27B0"/>
+  
+  <!-- Flag -->
+  <rect x="30" y="4" width="4" height="16" fill="#9C27B0"/>
+  <rect x="34" y="4" width="12" height="8" fill="#FF5722"/>
+  
+  <!-- Steps -->
+  <rect x="6" y="50" width="52" height="4" fill="#9C27B0"/>
+  <rect x="4" y="54" width="56" height="4" fill="#9C27B0"/>
+  <rect x="2" y="58" width="60" height="4" fill="#9C27B0"/>
+  
+  <!-- Door -->
+  <rect x="26" y="36" width="12" height="16" fill="#9C27B0"/>
+  <circle cx="35" cy="44" r="1" fill="#F3E5F5"/>
+</svg>
