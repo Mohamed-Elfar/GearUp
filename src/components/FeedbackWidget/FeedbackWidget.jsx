@@ -2,6 +2,7 @@
 import React, { useState, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { useLanguage } from "../../hooks/useLanguage";
+import styles from "./FeedbackWidget.module.css";
 
 export default function FeedbackWidget() {
   const { t } = useTranslation();
@@ -117,48 +118,56 @@ export default function FeedbackWidget() {
   return (
     <>
       {/* Main Feedback Button*/}
-      <div className="fixed bottom-0 sm:left-8 md:left-16 z-50 ">
+      <div
+        className={`position-fixed bottom-0 start-0 ms-3 ms-md-5 ${styles.feedbackButtonContainer}`}
+      >
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="feedbackBtn bg-gray-700 text-white px-4 py-2 rounded-t-lg shadow-lg hover:bg-gray-800 transition-colors flex items-center gap-2"
+          className={`btn btn-secondary d-flex align-items-center gap-2 px-3 py-2 border-0 shadow-lg ${styles.feedbackButton}`}
         >
           <span>💬</span>
-          <span className="font-medium">{t("feedback.button")}</span>
+          <span className="fw-medium text-white">{t("feedback.button")}</span>
         </button>
       </div>
 
       {/* Feedback Panel */}
       {isOpen && (
-        <div className="fixed bottom-16 sm:left-8 md:left-16 z-50">
-          <div className="bg-primary-500 text-white rounded-t-lg shadow-xl w-96 overflow-hidden">
+        <div
+          className={`position-fixed bottom-0 start-0 ms-3 ms-md-5 ${styles.feedbackPanel}`}
+        >
+          <div
+            className={`bg-primary text-white shadow-lg overflow-hidden ${styles.feedbackPanelContent}`}
+          >
             {!selectedType ? (
               // Type Selection Panel
               <div className="p-4">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="font-semibold text-white">
+                <div className="d-flex align-items-center justify-content-between mb-4">
+                  <h3 className="fw-semibold text-white mb-0">
                     {t("feedback.title")}
                   </h3>
                   <button
                     onClick={() => setIsOpen(false)}
-                    className="text-white hover:text-gray-200"
+                    className={`btn btn-link text-white p-0 text-decoration-none ${styles.closeButton}`}
                   >
                     ✕
                   </button>
                 </div>
 
-                <div className="space-y-3">
+                <div className="d-flex flex-column gap-3">
                   <button
                     onClick={() => setSelectedType("idea")}
-                    className="w-full p-3 bg-primary-700 text-white font-bold rounded hover:bg-primary-800 transition-colors flex items-center gap-3"
+                    className={`btn w-100 p-3 text-white fw-bold d-flex align-items-center gap-3 text-start ${styles.typeButton}`}
                   >
-                    <div className="w-8 h-8 bg-blue-500 rounded flex items-center justify-center">
+                    <div
+                      className={`d-flex align-items-center justify-content-center text-white ${styles.typeIcon} ${styles.ideaIcon}`}
+                    >
                       💡
                     </div>
-                    <div className="text-left">
-                      <div className="font-medium">
+                    <div>
+                      <div className="fw-medium">
                         {t("feedback.idea.title")}
                       </div>
-                      <div className="text-sm text-blue-100">
+                      <div className={`small ${styles.typeDescription}`}>
                         {t("feedback.idea.description")}
                       </div>
                     </div>
@@ -166,16 +175,18 @@ export default function FeedbackWidget() {
 
                   <button
                     onClick={() => setSelectedType("issue")}
-                    className="w-full p-3 bg-primary-700 text-white font-bold rounded hover:bg-primary-800 transition-colors flex items-center gap-3"
+                    className={`btn w-100 p-3 text-white fw-bold d-flex align-items-center gap-3 text-start ${styles.typeButton}`}
                   >
-                    <div className="w-8 h-8 bg-red-500 rounded flex items-center justify-center">
+                    <div
+                      className={`d-flex align-items-center justify-content-center text-white ${styles.typeIcon} ${styles.issueIcon}`}
+                    >
                       🐛
                     </div>
-                    <div className="text-left">
-                      <div className="font-medium">
+                    <div>
+                      <div className="fw-medium">
                         {t("feedback.issue.title")}
                       </div>
-                      <div className="text-sm text-blue-100">
+                      <div className={`small ${styles.typeDescription}`}>
                         {t("feedback.issue.description")}
                       </div>
                     </div>
@@ -185,27 +196,27 @@ export default function FeedbackWidget() {
             ) : (
               // Form Panel
               <div className="p-4">
-                <div className="flex items-center justify-between mb-4">
+                <div className="d-flex align-items-center justify-content-between mb-4">
                   <button
                     onClick={() => setSelectedType(null)}
-                    className="text-white hover:text-gray-200 fs-2"
+                    className={`btn btn-link text-white p-0 text-decoration-none ${styles.backButton}`}
                   >
                     {language === "AR" ? "→" : "←"}
                   </button>
-                  <h3 className="font-semibold text-white">
+                  <h3 className="fw-semibold text-white mb-0">
                     {selectedType === "idea"
                       ? t("feedback.idea.title")
                       : t("feedback.issue.title")}
                   </h3>
                   <button
                     onClick={() => setIsOpen(false)}
-                    className="text-white hover:text-gray-200"
+                    className={`btn btn-link text-white p-0 text-decoration-none ${styles.closeButton}`}
                   >
                     ✕
                   </button>
                 </div>
 
-                <div className="space-y-4">
+                <div className="d-flex flex-column gap-3">
                   <div>
                     <input
                       type="text"
@@ -214,7 +225,7 @@ export default function FeedbackWidget() {
                       onChange={(e) =>
                         handleInputChange("fullName", e.target.value)
                       }
-                      className="w-full p-2 bg-white border border-gray-300 rounded text-gray-800 placeholder-gray-500"
+                      className={`form-control ${styles.formInput}`}
                     />
                   </div>
 
@@ -226,7 +237,7 @@ export default function FeedbackWidget() {
                       onChange={(e) =>
                         handleInputChange("email", e.target.value)
                       }
-                      className="w-full p-2 bg-white border border-gray-300 rounded text-gray-800 placeholder-gray-500"
+                      className={`form-control ${styles.formInput}`}
                     />
                   </div>
 
@@ -238,7 +249,7 @@ export default function FeedbackWidget() {
                       onChange={(e) =>
                         handleInputChange("title", e.target.value)
                       }
-                      className="w-full p-2 bg-white border border-gray-300 rounded text-gray-800 placeholder-gray-500"
+                      className={`form-control ${styles.formInput}`}
                     />
                   </div>
 
@@ -250,29 +261,29 @@ export default function FeedbackWidget() {
                         handleInputChange("details", e.target.value)
                       }
                       rows={4}
-                      className="w-full p-2 bg-white border border-gray-300 rounded text-gray-800 placeholder-gray-500 resize-none"
+                      className={`form-control ${styles.formTextarea}`}
                     />
                   </div>
 
                   {/* File Upload Section */}
-                  <div className="space-y-2">
-                    <div className="flex gap-2">
+                  <div className="d-flex flex-column gap-2">
+                    <div className="d-flex gap-2">
                       <button
                         onClick={handleScreenshot}
-                        className="flex-1 p-2 bg-primary-700 text-white font-bold rounded hover:bg-primary-800 transition-colors flex items-center justify-center gap-2"
+                        className={`btn flex-fill fw-bold d-flex align-items-center justify-content-center gap-2 ${styles.uploadButton}`}
                       >
                         📷{" "}
-                        <span className="text-sm">
+                        <span className="small">
                           {t("feedback.form.screenshot")}
                         </span>
                       </button>
 
                       <button
                         onClick={() => fileInputRef.current?.click()}
-                        className="flex-1 p-2 bg-primary-700 text-white font-bold rounded hover:bg-primary-800 transition-colors flex items-center justify-center gap-2"
+                        className={`btn flex-fill fw-bold d-flex align-items-center justify-content-center gap-2 ${styles.uploadButton}`}
                       >
                         📎{" "}
-                        <span className="text-sm">
+                        <span className="small">
                           {t("feedback.form.upload")}
                         </span>
                       </button>
@@ -283,24 +294,26 @@ export default function FeedbackWidget() {
                       type="file"
                       onChange={handleFileUpload}
                       accept="image/*,.pdf,.doc,.docx,.txt"
-                      className="hidden"
+                      className="d-none"
                     />
 
                     {/* Display uploaded file */}
                     {uploadedFile && (
-                      <div className="flex items-center justify-between p-4 bg-white border border-gray-300 rounded min-h-[60px]">
-                        <div className="flex items-center gap-2">
+                      <div
+                        className={`d-flex align-items-center justify-content-between p-3 bg-white border rounded ${styles.fileDisplay}`}
+                      >
+                        <div className="d-flex align-items-center gap-2">
                           <span>📄</span>
-                          <span className="text-sm truncate text-gray-800">
+                          <span className="small text-truncate text-dark">
                             {uploadedFile.name}
                           </span>
-                          <span className="text-xs text-gray-600">
+                          <span className={`text-muted ${styles.fileSize}`}>
                             {(uploadedFile.size / 1024).toFixed(1)} KB
                           </span>
                         </div>
                         <button
                           onClick={removeFile}
-                          className="text-red-500 hover:text-red-700"
+                          className="btn btn-link text-danger p-0 text-decoration-none"
                         >
                           ✕
                         </button>
@@ -309,19 +322,21 @@ export default function FeedbackWidget() {
 
                     {/* Display screenshot */}
                     {screenshot && (
-                      <div className="flex items-center justify-between p-4 bg-white border border-gray-300 rounded min-h-[60px]">
-                        <div className="flex items-center gap-2">
+                      <div
+                        className={`d-flex align-items-center justify-content-between p-3 bg-white border rounded ${styles.fileDisplay}`}
+                      >
+                        <div className="d-flex align-items-center gap-2">
                           <span>📷</span>
-                          <span className="text-sm text-gray-800">
+                          <span className="small text-dark">
                             {t("feedback.files.screenshot")}
                           </span>
-                          <span className="text-xs text-gray-600">
+                          <span className={`text-muted ${styles.fileSize}`}>
                             {(screenshot.size / 1024).toFixed(1)} KB
                           </span>
                         </div>
                         <button
                           onClick={removeScreenshot}
-                          className="text-red-500 hover:text-red-700"
+                          className="btn btn-link text-danger p-0 text-decoration-none"
                         >
                           ✕
                         </button>
@@ -331,7 +346,7 @@ export default function FeedbackWidget() {
 
                   <button
                     onClick={handleSubmit}
-                    className="w-full p-2 bg-secondary-400 hover:bg-secondary-600 rounded font-medium transition-colors"
+                    className={`btn w-100 fw-medium ${styles.submitButton}`}
                   >
                     {t("feedback.form.submit")}
                   </button>
@@ -344,30 +359,34 @@ export default function FeedbackWidget() {
 
       {/* Screenshot Permission Modal */}
       {showScreenshotPermission && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60]">
-          <div className="bg-white rounded-lg p-6 max-w-md mx-4">
+        <div
+          className={`position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center ${styles.modalOverlay}`}
+        >
+          <div className={`bg-white rounded p-4 mx-3 ${styles.modalContent}`}>
             <div className="text-center mb-4">
-              <div className="w-16 h-16 mx-auto mb-4 bg-blue-100 rounded-full flex items-center justify-center">
-                <span className="text-2xl">🖥️</span>
+              <div
+                className={`mx-auto mb-3 d-flex align-items-center justify-content-center rounded-circle ${styles.modalIcon}`}
+              >
+                <span className={styles.modalIconText}>🖥️</span>
               </div>
-              <h3 className="text-lg font-semibold text-gray-800 mb-2">
+              <h3 className="fs-5 fw-semibold text-dark mb-2">
                 {t("feedback.screenshotPermission.title")}
               </h3>
-              <p className="text-sm text-gray-600">
+              <p className="small text-muted">
                 {t("feedback.screenshotPermission.description")}
               </p>
             </div>
 
-            <div className="flex gap-3">
+            <div className="d-flex gap-3">
               <button
                 onClick={cancelScreenshot}
-                className="flex-1 px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded font-medium transition-colors"
+                className={`btn btn-light flex-fill fw-medium ${styles.modalButton}`}
               >
                 {t("feedback.screenshotPermission.cancel")}
               </button>
               <button
                 onClick={allowScreenshot}
-                className="flex-1 px-4 py-2 bg-primary-700 text-white font-bold rounded hover:bg-primary-800 transition-colors"
+                className={`btn btn-primary flex-fill fw-bold ${styles.modalPrimaryButton}`}
               >
                 {t("feedback.screenshotPermission.allow")}
               </button>

@@ -1,0 +1,142 @@
+/* FeedbackWidget Module CSS */
+
+/* Main Feedback Button */
+.feedbackButton {
+  background-color: #374151;
+  border-top-left-radius: 0.5rem;
+  border-top-right-radius: 0.5rem;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  transition: background-color 0.2s ease;
+}
+
+.feedbackButton:hover {
+  background-color: #1f2937;
+}
+
+.feedbackButtonContainer {
+  z-index: 1050;
+}
+
+/* Feedback Panel */
+.feedbackPanel {
+  z-index: 1050;
+  bottom: 64px;
+}
+
+.feedbackPanelContent {
+  width: 384px;
+  max-width: 90vw;
+  border-top-left-radius: 0.5rem;
+  border-top-right-radius: 0.5rem;
+  background-color: var(--bs-primary);
+}
+
+.closeButton {
+  font-size: 1.2rem;
+}
+
+.backButton {
+  font-size: 1.5rem;
+}
+
+/* Type Selection Buttons */
+.typeButton {
+  background-color: rgba(255, 255, 255, 0.1);
+  border: none;
+  border-radius: 0.5rem;
+  transition: background-color 0.2s ease;
+}
+
+.typeButton:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.typeIcon {
+  width: 32px;
+  height: 32px;
+  border-radius: 0.5rem;
+}
+
+.ideaIcon {
+  background-color: #3b82f6;
+}
+
+.issueIcon {
+  background-color: #ef4444;
+}
+
+.typeDescription {
+  color: #bfdbfe;
+}
+
+/* Form Elements */
+.formInput {
+  color: #1f2937;
+}
+
+.formTextarea {
+  color: #1f2937;
+  resize: none;
+}
+
+/* File Upload Buttons */
+.uploadButton {
+  background-color: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: white;
+  transition: background-color 0.2s ease;
+}
+
+.uploadButton:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* File Display */
+.fileDisplay {
+  min-height: 60px;
+}
+
+.fileSize {
+  font-size: 0.75rem;
+}
+
+/* Submit Button */
+.submitButton {
+  background-color: var(--bs-secondary);
+  color: white;
+  transition: background-color 0.2s ease;
+}
+
+.submitButton:hover {
+  background-color: #6c757d;
+}
+
+/* Screenshot Permission Modal */
+.modalOverlay {
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1060;
+}
+
+.modalContent {
+  max-width: 448px;
+}
+
+.modalIcon {
+  width: 64px;
+  height: 64px;
+  background-color: #dbeafe;
+}
+
+.modalIconText {
+  font-size: 2rem;
+}
+
+.modalButton {
+  transition: background-color 0.2s ease;
+}
+
+.modalPrimaryButton {
+  background-color: var(--bs-primary);
+  transition: background-color 0.2s ease;
+}

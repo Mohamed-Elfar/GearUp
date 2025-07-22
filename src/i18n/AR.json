@@ -18,6 +18,10 @@
     "login": "تسجيل الدخول",
     "joinUs": "انضم إلينا"
   },
+  "brand": {
+    "name": "GearUp",
+    "tagline": "التعلم والنمو المهني"
+  },
   "login": {
     "title": "تسجيل الدخول إلى حسابك",
     "google": "جوجل",
@@ -43,9 +47,10 @@
     "emailPlaceholder": "أدخل بريدك الإلكتروني",
     "agreeToTerms": "أوافق على",
     "termsAndConditions": "الشروط والأحكام",
+    "registerButton": "انضم إلينا",
     "joinUsButton": "انضم إلينا",
     "alreadyHaveAccount": "هل لديك حساب بالفعل؟",
-    "login": "تسجيل الدخول"
+    "loginHere": "تسجيل الدخول هنا"
   },
   "footer": {
     "contactUs": "تواصل معنا",

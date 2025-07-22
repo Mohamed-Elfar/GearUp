@@ -1,0 +1,123 @@
+/* Navbar Module CSS */
+
+/* Main navbar container */
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1030;
+}
+
+.navbarContainer {
+  min-height: 64px;
+}
+
+/* Brand colors */
+.brandGear {
+  color: #78909c !important;
+}
+
+.brandUp {
+  color: #1e88e5 !important;
+}
+
+/* Desktop login button */
+.loginButton {
+  font-size: 1rem;
+}
+
+/* Mobile menu button */
+.mobileMenuButton {
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+/* Mobile navigation */
+.mobileNav {
+  background-color: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  width: 100%;
+  margin: 0;
+  padding: 1.5rem 0;
+}
+
+.mobileNavContainer {
+  width: 100%;
+  padding: 0 1rem;
+}
+
+.mobileNavDivider {
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  width: 100%;
+  margin-top: 1rem;
+  padding-top: 1rem;
+}
+
+.mobileNavActions {
+  width: 100%;
+  gap: 1rem;
+}
+
+/* Remove text decoration for mobile links */
+.mobileNavLink {
+  text-decoration: none;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  transition: background-color 0.2s ease;
+}
+
+.mobileNavLink:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.mobileLoginButton {
+  width: 100%;
+  text-align: center;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  transition: background-color 0.2s ease;
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  margin-bottom: 0.75rem;
+}
+
+.mobileLoginButton:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.mobileJoinButton {
+  width: 100%;
+  padding: 0;
+  margin: 0;
+}
+
+/* Mobile button styling for join button */
+.mobileJoinButtonStyled {
+  width: 100% !important;
+  padding: 0.75rem 1rem !important;
+  border-radius: 0.5rem !important;
+  transition: background-color 0.2s ease;
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  margin: 0 !important;
+  position: relative;
+  overflow: hidden;
+}
+
+.mobileJoinButtonStyled::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(255, 255, 255, 0);
+  transition: background-color 0.2s ease;
+  pointer-events: none;
+}
+
+.mobileJoinButtonStyled:hover::before {
+  background-color: rgba(255, 255, 255, 0.1);
+}

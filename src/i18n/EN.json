@@ -19,6 +19,10 @@
     "login": "Login",
     "joinUs": "Join Us"
   },
+  "brand": {
+    "name": "GearUp",
+    "tagline": "Learning and Career Growth"
+  },
   "login": {
     "title": "Log in to your account",
     "google": "Google",
@@ -44,9 +48,10 @@
     "emailPlaceholder": "Enter your email",
     "agreeToTerms": "I agree to the",
     "termsAndConditions": "terms and conditions",
+    "registerButton": "Join Us",
     "joinUsButton": "Join Us",
     "alreadyHaveAccount": "Already have an account?",
-    "login": "Login"
+    "loginHere": "Login here"
   },
   "footer": {
     "contactUs": "Contact Us",

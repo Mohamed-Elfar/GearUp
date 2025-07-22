@@ -4,7 +4,7 @@ import { NavLink } from "react-router-dom";
 import TransButton from "../TransButton";
 import logo from "../../assets/logo.png";
 import Button from "../Button/Button";
-import "./Navbar.css";
+import styles from "./Navbar.module.css";
 
 // Lazy load modal components for better performance
 const LoginModal = React.lazy(() => import("../LoginModal/LoginModal"));
@@ -39,15 +39,17 @@ const Navbar = memo(() => {
 
   return (
     <nav
-      className="bg-primary-50 w-full py-3 fixed top-0 left-0 z-50 shadow-sm mb-5"
+      className={`navbar navbar-expand-lg navbar-custom shadow-sm ${styles.navbar}`}
       role="navigation"
       aria-label="Main navigation"
     >
-      <div className="max-w-8xl mx-auto sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
+      <div className="container-fluid px-3 px-lg-4">
+        <div
+          className={`d-flex justify-content-between align-items-center w-100 ${styles.navbarContainer}`}
+        >
           {/* Logo */}
           <NavLink
-            className="logo flex items-center gap-3"
+            className="navbar-brand d-flex align-items-center gap-3 text-decoration-none"
             to="/home"
             aria-label="GearUp - Go to home page"
           >
@@ -60,50 +62,64 @@ const Navbar = memo(() => {
               loading="eager"
             />
             <div className="company-brand">
-              <div className="brand-name" aria-label="GearUp">
-                <span className="consul-nav">Gear</span>
-                <span className="rain-nav">Up</span>
+              <div
+                className="brand-name d-flex align-items-center"
+                aria-label={t("brand.name")}
+              >
+                <span
+                  className={`consul-nav text-white fw-bold fs-3 me-1 ${styles.brandGear}`}
+                >
+                  GEAR
+                </span>
+                <span
+                  className={`rain-nav text-white fw-bold fs-3 ${styles.brandUp}`}
+                >
+                  UP
+                </span>
                 <span className="co-nav"></span>
               </div>
               <div
-                className="brand-tagline"
-                aria-label="Learning and Career Growth"
+                className="brand-tagline text-white-50 small"
+                aria-label={t("brand.tagline")}
               >
-                Learning and Career Growth
+                {t("brand.tagline")}
               </div>
             </div>
           </NavLink>
 
           {/* Desktop Navigation */}
-          <div className="hidden lg:flex items-center justify-center flex-1 mx-8 h-full">
-            <ul className="flex items-center gap-8 m-0" role="menubar">
-              <li role="none">
+          <div className="d-none d-lg-flex align-items-center justify-content-center flex-grow-1 mx-4">
+            <ul
+              className="navbar-nav d-flex flex-row align-items-center gap-4 mb-0"
+              role="menubar"
+            >
+              <li className="nav-item" role="none">
                 <NavLink
                   to="/learning"
-                  className="text-gray-700 hover:text-primary-700 font-bold no-underline transition-colors duration-200 text-black"
+                  className="nav-link text-white fw-medium text-decoration-none px-3"
                   role="menuitem"
                   aria-label="Learning programs and courses"
                 >
                   {t("navbar.learning")}{" "}
-                  <span className="ml-1" aria-hidden="true">
+                  <span className="ms-1" aria-hidden="true">
                     ▼
                   </span>
                 </NavLink>
               </li>
-              <li role="none">
+              <li className="nav-item" role="none">
                 <NavLink
                   to="/graduates"
-                  className="text-gray-700 hover:text-primary-700 font-bold no-underline transition-colors duration-200 text-black"
+                  className="nav-link text-white fw-medium text-decoration-none px-3"
                   role="menuitem"
                   aria-label="Hire our graduates"
                 >
                   {t("navbar.hireGraduates")}
                 </NavLink>
               </li>
-              <li role="none">
+              <li className="nav-item" role="none">
                 <NavLink
                   to="/partnership"
-                  className="text-gray-700 hover:text-primary-700 font-bold no-underline transition-colors duration-200 text-black"
+                  className="nav-link text-white fw-medium text-decoration-none px-3"
                   role="menuitem"
                   aria-label="Partnership opportunities"
                 >
@@ -114,11 +130,11 @@ const Navbar = memo(() => {
           </div>
 
           {/* Right side - Desktop */}
-          <div className="hidden lg:flex items-center gap-3">
+          <div className="d-none d-lg-flex align-items-center gap-3">
             <TransButton />
             <button
               onClick={openLoginModal}
-              className="text-primary-500 font-bold no-underline hover:text-primary-700 transition-colors duration-200 px-2"
+              className={`btn btn-link text-white fw-medium text-decoration-none px-2 ${styles.loginButton}`}
             >
               {t("navbar.login")}
             </button>
@@ -131,7 +147,7 @@ const Navbar = memo(() => {
 
           {/* Mobile menu button */}
           <button
-            className="lg:hidden p-2 rounded-md text-gray-700 hover:text-primary-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-primary-500"
+            className={`navbar-toggler d-lg-none btn btn-outline-light p-2 ${styles.mobileMenuButton}`}
             onClick={toggleMobileMenu}
             aria-label={
               isMenuOpen ? "Close navigation menu" : "Open navigation menu"
@@ -141,10 +157,11 @@ const Navbar = memo(() => {
             type="button"
           >
             <svg
-              className="h-6 w-6"
+              width="24"
+              height="24"
               fill="none"
               viewBox="0 0 24 24"
-              stroke="currentColor"
+              stroke="white"
               aria-hidden="true"
             >
               {isMenuOpen ? (
@@ -169,16 +186,15 @@ const Navbar = memo(() => {
         {/* Mobile Navigation */}
         {isMenuOpen && (
           <div
-            className="lg:hidden py-4 border-t border-gray-200"
+            className={`d-lg-none ${styles.mobileNav}`}
             id="mobile-menu"
             role="menu"
             aria-labelledby="mobile-menu-button"
           >
-            <div className="flex flex-col space-y-4">
+            <div className={`d-flex flex-column ${styles.mobileNavContainer}`}>
               <NavLink
                 to="/learning"
-                className="text-gray-700 hover:text-primary-700 font-bold no-underline decoration-none py-2 text-black"
-                style={{ textDecoration: "none" }}
+                className={`nav-link text-white fw-medium text-decoration-none ${styles.mobileNavLink}`}
                 onClick={() => setIsMenuOpen(false)}
                 role="menuitem"
                 aria-label="Learning programs and courses"
@@ -187,8 +203,7 @@ const Navbar = memo(() => {
               </NavLink>
               <NavLink
                 to="/graduates"
-                className="text-gray-700 hover:text-primary-700 font-bold no-underline decoration-none py-2 text-black"
-                style={{ textDecoration: "none" }}
+                className={`nav-link text-white fw-medium text-decoration-none ${styles.mobileNavLink}`}
                 onClick={() => setIsMenuOpen(false)}
                 role="menuitem"
                 aria-label="Hire our graduates"
@@ -197,36 +212,42 @@ const Navbar = memo(() => {
               </NavLink>
               <NavLink
                 to="/partnership"
-                className="text-gray-700 hover:text-primary-700 font-bold no-underline decoration-none py-2 text-black"
-                style={{ textDecoration: "none" }}
+                className={`nav-link text-white fw-medium text-decoration-none ${styles.mobileNavLink}`}
                 onClick={() => setIsMenuOpen(false)}
                 role="menuitem"
                 aria-label="Partnership opportunities"
               >
                 {t("navbar.partnership")}
               </NavLink>
-              <div className="flex flex-col space-y-3 pt-4 border-t border-gray-200">
-                <TransButton />
-                <button
-                  onClick={() => {
-                    setIsMenuOpen(false);
-                    openLoginModal();
-                  }}
-                  className="text-primary-500 font-bold no-underline decoration-none hover:text-primary-700 my-2 text-left"
-                  style={{ textDecoration: "none" }}
-                  type="button"
-                  aria-label="Login to your account"
-                >
-                  {t("navbar.login")}
-                </button>
-                <Button
-                  label={t("navbar.joinUs")}
-                  handleClick={() => {
-                    openRegisterModal();
-                    setIsMenuOpen(false);
-                  }}
-                  aria-label="Join our platform"
-                />
+
+              <div className={`d-flex flex-column ${styles.mobileNavDivider}`}>
+                <div className="mb-3 w-100">
+                  <TransButton mobileStyle={true} />
+                </div>
+                <div className="d-flex flex-column w-100">
+                  <button
+                    onClick={() => {
+                      setIsMenuOpen(false);
+                      openLoginModal();
+                    }}
+                    className={`btn text-white fw-medium ${styles.mobileLoginButton}`}
+                    type="button"
+                    aria-label="Login to your account"
+                  >
+                    {t("navbar.login")}
+                  </button>
+                  <div className={styles.mobileJoinButton}>
+                    <Button
+                      label={t("navbar.joinUs")}
+                      customClasses={`btn btn-primary fw-bold ${styles.mobileJoinButtonStyled}`}
+                      handleClick={() => {
+                        openRegisterModal();
+                        setIsMenuOpen(false);
+                      }}
+                      aria-label="Join our platform"
+                    />
+                  </div>
+                </div>
               </div>
             </div>
           </div>

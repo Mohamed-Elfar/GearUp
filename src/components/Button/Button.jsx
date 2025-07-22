@@ -14,9 +14,10 @@ export default function Button(props) {
       style={customStyles}
       className={`${
         props.customClasses
-          ? `${props.customClasses} font-bold rounded transition-colors duration-200`
-          : "bg-primary-500 text-white font-bold rounded hover:bg-primary-700 transition-colors duration-200 px-6 py-3"
+          ? `${props.customClasses} fw-bold rounded transition-all`
+          : "btn btn-primary fw-bold rounded-3 px-4 py-2"
       }`}
+      type="button"
     >
       {props.label}
     </button>
