@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import logoImage from "../../assets/logo.png";
-import styles from "./SplashPage.module.css";
+import logoImage from "../../assets/spinnerLogo.png";
+import "./SplashPage.css";
 
 export default function SplashPage() {
   const navigate = useNavigate();
@@ -17,28 +17,28 @@ export default function SplashPage() {
   }, [navigate]);
 
   return (
-    <div className={styles.splashContainer}>
-      <div className={styles.splashContent}>
+    <div className="splash-container">
+      <div className="splash-content">
         {/* Spinning Logo */}
-        <div className={styles.logoContainer}>
-          <img
-            src={logoImage}
-            alt="GearUp Logo"
-            className={styles.spinningLogo}
-          />
+        <div className="logo-container">
+          <img src={logoImage} alt="GearUp Logo" className="spinning-logo" />
         </div>
 
         {/* Company Name */}
-        <div className={styles.companyInfo}>
-          <h1 className={styles.companyName}>GearUp</h1>
-          <p className={styles.companyTagline}>
-            Transforming Vision into Reality
-          </p>
+        <div className="company-info">
+          <div className="company-text-container">
+            <h1 className="company-main-name">
+              <span className="consul">Gear</span>
+              <span className="rain">Up</span>
+              <span className="co"></span>
+            </h1>
+            <p className="company-subtitle">Learning and Career Growth</p>
+          </div>
 
           {/* Loading Animation */}
-          <div className={styles.loadingAnimation}>
-            <div className={styles.loadingBar}>
-              <div className={styles.loadingProgress}></div>
+          <div className="loading-animation">
+            <div className="loading-bar">
+              <div className="loading-progress"></div>
             </div>
           </div>
         </div>

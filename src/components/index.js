@@ -4,4 +4,14 @@ import Navbar from "./Navbar/Navbar";
 import LoginModal from "./LoginModal/LoginModal";
 import RegisterModal from "./RegisterModal/RegisterModal";
 import FeedbackWidget from "./FeedbackWidget/FeedbackWidget";
-export { Navbar, Footer, Header, LoginModal, RegisterModal, FeedbackWidget };
+import SEO from "./SEO/SEO";
+export {
+  Navbar,
+  Footer,
+  Header,
+
+  LoginModal,
+  RegisterModal,
+  FeedbackWidget,
+  SEO,
+};

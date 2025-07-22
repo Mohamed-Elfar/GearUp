@@ -138,9 +138,9 @@ export default function Footer() {
               </p>
               <ul className="cat-dropdown-menu">
                 <li>
-                  <a href="mailto:info@gearup.com">
+                  <a href="mailto:info@consulrain.com">
                     <p className="p3 text-start text-blue-100 hover:text-white mb-3">
-                      info@gearup.com
+                      info@consulrain.com
                     </p>
                   </a>
                 </li>

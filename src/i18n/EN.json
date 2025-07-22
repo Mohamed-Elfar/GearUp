@@ -1,6 +1,6 @@
 {
   "header": {
-    "title": "Learning That Works, Employment That Fits",
+    "title": "GearUp - Accelerate Your Learning Journey",
     "learning": "Learning",
     "forLearners": "For Learners",
     "embeddedSystems": "Embedded Systems",
@@ -54,6 +54,7 @@
     "ourServices": { "Our Services": "Our Services" },
     "training": { "Training": "Training" }
   },
+
   "feedback": {
     "button": "Feedback",
     "title": "Send feedback",

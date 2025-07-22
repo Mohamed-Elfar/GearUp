@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import { createContext, useState, useEffect } from "react";
 import i18n from "../i18n";
 
@@ -30,6 +31,8 @@ const LanguageProvider = ({ children }) => {
     </LanguageContext.Provider>
   );
 };
-
+LanguageProvider.propTypes = {
+  children: PropTypes.node.isRequired,
+};
 export { LanguageContext, LanguageProvider };
 export default LanguageProvider;
