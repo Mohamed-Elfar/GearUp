@@ -1,22 +1,26 @@
 // src/components/RegisterModal/RegisterModal.jsx
-import React, { useState } from "react";
+import React from "react";
 import { useTranslation } from "react-i18next";
+import { Formik, Form, Field, ErrorMessage } from "formik";
+import * as Yup from "yup";
 
 export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
   const { t } = useTranslation();
-  const [email, setEmail] = useState("");
-  const [agreeToTerms, setAgreeToTerms] = useState(false);
+
+  const validationSchema = Yup.object({
+    email: Yup.string()
+      .email("Invalid email address")
+      .required("Email is required"),
+    agreeToTerms: Yup.boolean().oneOf(
+      [true],
+      "You must agree to the terms and conditions"
+    ),
+  });
 
   if (!isOpen) return null;
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (!agreeToTerms) {
-      alert("Please agree to the terms and conditions");
-      return;
-    }
-    // Handle registration logic here
-    console.log("Registration attempt:", { email, agreeToTerms });
+  const handleSubmit = (values) => {
+    console.log("Registration attempt:", values);
   };
 
   const handleSocialLogin = (provider) => {
@@ -114,49 +118,64 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
         </div>
 
         {/* Registration Form */}
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              {t("register.email")}:
-            </label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-700 focus:border-transparent outline-none transition-all"
-              placeholder={t("register.emailPlaceholder")}
-              required
-            />
-          </div>
+        <Formik
+          initialValues={{ email: "", agreeToTerms: false }}
+          validationSchema={validationSchema}
+          onSubmit={handleSubmit}
+        >
+          {({ isSubmitting }) => (
+            <Form className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  {t("register.email")}:
+                </label>
+                <Field
+                  type="email"
+                  name="email"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-700 focus:border-transparent outline-none transition-all"
+                  placeholder={t("register.emailPlaceholder")}
+                />
+                <ErrorMessage
+                  name="email"
+                  component="div"
+                  className="text-red-500 text-sm mt-1"
+                />
+              </div>
 
-          {/* Terms and Conditions Checkbox */}
-          <div className="flex items-start gap-3 mb-4">
-            <input
-              type="checkbox"
-              id="agreeToTerms"
-              checked={agreeToTerms}
-              onChange={(e) => setAgreeToTerms(e.target.checked)}
-              className="mt-1 w-4 h-4 text-brand-blue border border-gray-300 rounded focus:ring-primary-700"
-              required
-            />
-            <label htmlFor="agreeToTerms" className="text-sm text-gray-600">
-              {t("register.agreeToTerms")}{" "}
-              <a
-                href="#"
-                className="text-brand-blue hover:text-brand-teal underline"
+              {/* Terms and Conditions Checkbox */}
+              <div className="flex items-start gap-3 mb-4">
+                <Field
+                  type="checkbox"
+                  name="agreeToTerms"
+                  id="agreeToTerms"
+                  className="mt-1 w-4 h-4 text-brand-blue border border-gray-300 rounded focus:ring-primary-700"
+                />
+                <label htmlFor="agreeToTerms" className="text-sm text-gray-600">
+                  {t("register.agreeToTerms")}{" "}
+                  <a
+                    href="#"
+                    className="text-brand-blue hover:text-brand-teal underline"
+                  >
+                    {t("register.termsAndConditions")}
+                  </a>
+                </label>
+              </div>
+              <ErrorMessage
+                name="agreeToTerms"
+                component="div"
+                className="text-red-500 text-sm"
+              />
+
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="w-full bg-primary-500 text-white font-bold rounded hover:bg-primary-700 py-3 px-4 transition-colors focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 outline-none disabled:opacity-50"
               >
-                {t("register.termsAndConditions")}
-              </a>
-            </label>
-          </div>
-
-          <button
-            type="submit"
-            className="w-full bg-primary-500 text-white font-bold rounded hover:bg-primary-700 py-3 px-4 transition-colors focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 outline-none"
-          >
-            {t("register.joinUsButton")}
-          </button>
-        </form>
+                {t("register.joinUsButton")}
+              </button>
+            </Form>
+          )}
+        </Formik>
 
         {/* Footer Links */}
         <div className="mt-6 text-center">

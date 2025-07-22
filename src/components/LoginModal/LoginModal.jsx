@@ -1,22 +1,28 @@
 // src/components/LoginModal/LoginModal.jsx
-import React, { useState } from "react";
+import React from "react";
 import { useTranslation } from "react-i18next";
+import { Formik, Form, Field, ErrorMessage } from "formik";
+import * as Yup from "yup";
 
 export default function LoginModal({ isOpen, onClose, onSwitchToRegister }) {
   const { t } = useTranslation();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+
+  const validationSchema = Yup.object({
+    email: Yup.string()
+      .email("Invalid email address")
+      .required("Email is required"),
+    password: Yup.string()
+      .min(8, "Password must be at least 8 characters")
+      .required("Password is required"),
+  });
 
   if (!isOpen) return null;
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // Handle login logic here
-    console.log("Login attempt:", { email, password });
+  const handleSubmit = (values) => {
+    console.log("Login attempt:", values);
   };
 
   const handleSocialLogin = (provider) => {
-    // Handle social login logic here
     console.log("Social login with:", provider);
   };
 
@@ -110,42 +116,57 @@ export default function LoginModal({ isOpen, onClose, onSwitchToRegister }) {
         </div>
 
         {/* Login Form */}
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              {t("login.email")}:
-            </label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-700 focus:border-transparent outline-none transition-all"
-              placeholder={t("login.emailPlaceholder")}
-              required
-            />
-          </div>
+        <Formik
+          initialValues={{ email: "", password: "" }}
+          validationSchema={validationSchema}
+          onSubmit={handleSubmit}
+        >
+          {({ isSubmitting }) => (
+            <Form className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  {t("login.email")}:
+                </label>
+                <Field
+                  type="email"
+                  name="email"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-700 focus:border-transparent outline-none transition-all"
+                  placeholder={t("login.emailPlaceholder")}
+                />
+                <ErrorMessage
+                  name="email"
+                  component="div"
+                  className="text-red-500 text-sm mt-1"
+                />
+              </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              {t("login.password")}:
-            </label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-700 focus:border-transparent outline-none transition-all"
-              placeholder={t("login.passwordPlaceholder")}
-              required
-            />
-          </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  {t("login.password")}:
+                </label>
+                <Field
+                  type="password"
+                  name="password"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-700 focus:border-transparent outline-none transition-all"
+                  placeholder={t("login.passwordPlaceholder")}
+                />
+                <ErrorMessage
+                  name="password"
+                  component="div"
+                  className="text-red-500 text-sm mt-1"
+                />
+              </div>
 
-          <button
-            type="submit"
-            className="w-full bg-primary-500 text-white font-bold rounded hover:bg-primary-700 py-3 px-4 transition-colors focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 outline-none"
-          >
-            {t("login.loginButton")}
-          </button>
-        </form>
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="w-full bg-primary-500 text-white font-bold rounded hover:bg-primary-700 py-3 px-4 transition-colors focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 outline-none disabled:opacity-50"
+              >
+                {t("login.loginButton")}
+              </button>
+            </Form>
+          )}
+        </Formik>
 
         {/* Footer Links */}
         <div className="mt-6 text-center space-y-2">
