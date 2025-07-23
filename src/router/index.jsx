@@ -6,6 +6,7 @@ import {
 
 import RootLayout from "../layout/RootLayout";
 import { HomePage, SplashPage } from "../pages";
+import { SellerDashboard } from "../pages/sellerDashboard/SellerDashboard";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -17,6 +18,7 @@ const router = createBrowserRouter(
       <Route path="/home" element={<RootLayout />}>
         <Route index element={<HomePage />} />
       </Route>
+      <Route path="/sellerDashboard" element={<SellerDashboard />} />
     </>
   )
 );
