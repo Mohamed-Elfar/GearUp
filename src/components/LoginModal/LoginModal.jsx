@@ -1,11 +1,16 @@
 // src/components/LoginModal/LoginModal.jsx
-import React from "react";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
+import { useAuthStore } from "../../stores/authStore";
 
 export default function LoginModal({ isOpen, onClose, onSwitchToRegister }) {
   const { t } = useTranslation();
+  const navigate = useNavigate();
+  const { signIn, needsProfileCompletion } = useAuthStore();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const validationSchema = Yup.object({
     email: Yup.string()
@@ -18,8 +23,59 @@ export default function LoginModal({ isOpen, onClose, onSwitchToRegister }) {
 
   if (!isOpen) return null;
 
-  const handleSubmit = (values) => {
-    console.log("Login attempt:", values);
+  const handleSubmit = async (values) => {
+    setIsSubmitting(true);
+    try {
+      console.log("Login attempt:", values);
+
+      // Add a timeout for the login process
+      const loginTimeout = new Promise((_, reject) =>
+        setTimeout(
+          () => reject(new Error("Login timeout - please try again")),
+          30000
+        )
+      );
+
+      const loginPromise = signIn(values.email, values.password);
+
+      const { data, error } = await Promise.race([loginPromise, loginTimeout]);
+
+      if (error) {
+        console.error("Login error:", error);
+        let errorMessage = "Login failed: ";
+
+        if (error.message.includes("Invalid login credentials")) {
+          errorMessage += "Invalid email or password";
+        } else if (error.message.includes("Email not confirmed")) {
+          errorMessage += "Please check your email and confirm your account";
+        } else if (error.message.includes("timeout")) {
+          errorMessage +=
+            "Request timed out. Please check your connection and try again";
+        } else {
+          errorMessage += error.message;
+        }
+
+        alert(errorMessage);
+        return;
+      }
+
+      if (data) {
+        console.log("Login successful, redirecting...");
+        onClose();
+
+        // Check if user needs to complete profile
+        if (needsProfileCompletion()) {
+          navigate("/home/profile");
+        } else {
+          navigate("/home");
+        }
+      }
+    } catch (error) {
+      console.error("Login error:", error);
+      alert("Login failed. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleSocialLogin = (provider) => {
@@ -134,7 +190,7 @@ export default function LoginModal({ isOpen, onClose, onSwitchToRegister }) {
               validationSchema={validationSchema}
               onSubmit={handleSubmit}
             >
-              {({ isSubmitting }) => (
+              {() => (
                 <Form>
                   <div className="mb-3">
                     <label className="form-label fw-medium text-dark">
@@ -175,7 +231,14 @@ export default function LoginModal({ isOpen, onClose, onSwitchToRegister }) {
                     disabled={isSubmitting}
                     className="btn btn-primary w-100 py-2 fw-bold"
                   >
-                    {t("login.loginButton")}
+                    {isSubmitting ? (
+                      <>
+                        <span className="spinner-border spinner-border-sm me-2" />
+                        Signing in...
+                      </>
+                    ) : (
+                      t("login.loginButton")
+                    )}
                   </button>
                 </Form>
               )}

@@ -1,16 +1,51 @@
 // src/components/RegisterModal/RegisterModal.jsx
-import React from "react";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
+import { useAuthStore } from "../../stores/authStore";
 
 export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
   const { t } = useTranslation();
+  const navigate = useNavigate();
+  const { signUp } = useAuthStore();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const validationSchema = Yup.object({
+    firstName: Yup.string()
+      .min(2, "First name must be at least 2 characters")
+      .required("First name is required"),
+    lastName: Yup.string()
+      .min(2, "Last name must be at least 2 characters")
+      .required("Last name is required"),
     email: Yup.string()
-      .email("Invalid email address")
+      .matches(
+        /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+        "Please enter a valid email address"
+      )
       .required("Email is required"),
+    password: Yup.string()
+      .min(8, "Password must be at least 8 characters")
+      .matches(
+        /(?=.*[a-z])/,
+        "Password must contain at least one lowercase letter"
+      )
+      .matches(
+        /(?=.*[A-Z])/,
+        "Password must contain at least one uppercase letter"
+      )
+      .matches(/(?=.*\d)/, "Password must contain at least one number")
+      .required("Password is required"),
+    confirmPassword: Yup.string()
+      .oneOf([Yup.ref("password"), null], "Passwords must match")
+      .required("Confirm password is required"),
+    role: Yup.string()
+      .oneOf(
+        ["customer", "seller", "service_provider"],
+        "Please select a valid role"
+      )
+      .required("Role is required"),
     agreeToTerms: Yup.boolean().oneOf(
       [true],
       "You must agree to the terms and conditions"
@@ -19,8 +54,72 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
 
   if (!isOpen) return null;
 
-  const handleSubmit = (values) => {
-    console.log("Registration attempt:", values);
+  const handleSubmit = async (values) => {
+    setIsSubmitting(true);
+    try {
+      console.log("=== REGISTRATION DEBUG START ===");
+      console.log("Registration attempt:", values);
+      console.log("Email being submitted:", values.email);
+      console.log("Email length:", values.email.length);
+      console.log("Email trimmed:", values.email.trim());
+      console.log("Supabase URL:", import.meta.env.VITE_SUPABASE_URL);
+      console.log(
+        "Supabase Key exists:",
+        !!import.meta.env.VITE_SUPABASE_ANON_KEY
+      );
+
+      const { data, error } = await signUp({
+        firstName: values.firstName,
+        lastName: values.lastName,
+        email: values.email.trim(), // Ensure no extra spaces
+        password: values.password,
+        role: values.role,
+      });
+
+      console.log("Registration response - data:", data);
+      console.log("Registration response - error:", error);
+
+      if (error) {
+        console.error("Supabase registration error:", error);
+        let errorMessage = "Registration failed: ";
+
+        if (error.message.includes("email")) {
+          errorMessage +=
+            "Email address issue. Please check your email format.";
+        } else if (error.message.includes("password")) {
+          errorMessage += "Password doesn't meet requirements.";
+        } else if (error.message.includes("User already registered")) {
+          errorMessage += "An account with this email already exists.";
+        } else {
+          errorMessage += error.message;
+        }
+
+        alert(errorMessage);
+        return;
+      }
+
+      if (data) {
+        if (data.session) {
+          // User is automatically logged in (email confirmation disabled)
+          alert("Registration successful! Welcome to GearUp!");
+          onClose();
+          navigate("/home/profile");
+        } else {
+          // Email confirmation required
+          alert(
+            "Registration successful! Please check your email to verify your account before logging in."
+          );
+          onClose();
+          // Don't navigate to profile since user needs to confirm email first
+        }
+      }
+      console.log("=== REGISTRATION DEBUG END ===");
+    } catch (error) {
+      console.error("Registration error:", error);
+      alert("Registration failed. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleSocialLogin = (provider) => {
@@ -135,62 +234,189 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
 
             {/* Registration Form */}
             <Formik
-              initialValues={{ email: "", agreeToTerms: false }}
+              initialValues={{
+                firstName: "",
+                lastName: "",
+                email: "",
+                password: "",
+                confirmPassword: "",
+                role: "",
+                agreeToTerms: false,
+              }}
               validationSchema={validationSchema}
               onSubmit={handleSubmit}
             >
-              {({ isSubmitting }) => (
-                <Form>
-                  <div className="mb-3">
-                    <label className="form-label fw-medium text-dark">
-                      {t("register.email")}:
-                    </label>
-                    <Field
-                      type="email"
-                      name="email"
-                      className="form-control py-2"
-                      placeholder={t("register.emailPlaceholder")}
-                    />
+              {({ values, errors, isValid, dirty }) => {
+                console.log("Form state:", { values, errors, isValid, dirty });
+                return (
+                  <Form noValidate>
+                    {/* Name Fields */}
+                    <div className="row mb-3">
+                      <div className="col-md-6">
+                        <label className="form-label fw-medium text-dark">
+                          {t("register.firstName")}:
+                        </label>
+                        <Field
+                          type="text"
+                          name="firstName"
+                          className="form-control py-2"
+                          placeholder={t("register.firstNamePlaceholder")}
+                        />
+                        <ErrorMessage
+                          name="firstName"
+                          component="div"
+                          className="text-danger small mt-1"
+                        />
+                      </div>
+                      <div className="col-md-6">
+                        <label className="form-label fw-medium text-dark">
+                          {t("register.lastName")}:
+                        </label>
+                        <Field
+                          type="text"
+                          name="lastName"
+                          className="form-control py-2"
+                          placeholder={t("register.lastNamePlaceholder")}
+                        />
+                        <ErrorMessage
+                          name="lastName"
+                          component="div"
+                          className="text-danger small mt-1"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Email */}
+                    <div className="mb-3">
+                      <label className="form-label fw-medium text-dark">
+                        {t("register.email")}:
+                      </label>
+                      <Field
+                        type="email"
+                        name="email"
+                        className="form-control py-2"
+                        placeholder={t("register.emailPlaceholder")}
+                      />
+                      <ErrorMessage
+                        name="email"
+                        component="div"
+                        className="text-danger small mt-1"
+                      />
+                    </div>
+
+                    {/* Role Selection */}
+                    <div className="mb-3">
+                      <label className="form-label fw-medium text-dark">
+                        {t("register.role")}:
+                      </label>
+                      <Field
+                        as="select"
+                        name="role"
+                        className="form-select py-2"
+                      >
+                        <option value="">{t("register.selectRole")}</option>
+                        <option value="customer">
+                          {t("register.customer")}
+                        </option>
+                        <option value="seller">{t("register.seller")}</option>
+                        <option value="service_provider">
+                          {t("register.serviceProvider")}
+                        </option>
+                      </Field>
+                      <ErrorMessage
+                        name="role"
+                        component="div"
+                        className="text-danger small mt-1"
+                      />
+                    </div>
+
+                    {/* Password Fields */}
+                    <div className="row mb-3">
+                      <div className="col-md-6">
+                        <label className="form-label fw-medium text-dark">
+                          {t("register.password")}:
+                        </label>
+                        <Field
+                          type="password"
+                          name="password"
+                          className="form-control py-2"
+                          placeholder={t("register.passwordPlaceholder")}
+                        />
+                        <ErrorMessage
+                          name="password"
+                          component="div"
+                          className="text-danger small mt-1"
+                        />
+                      </div>
+                      <div className="col-md-6">
+                        <label className="form-label fw-medium text-dark">
+                          {t("register.confirmPassword")}:
+                        </label>
+                        <Field
+                          type="password"
+                          name="confirmPassword"
+                          className="form-control py-2"
+                          placeholder={t("register.confirmPasswordPlaceholder")}
+                        />
+                        <ErrorMessage
+                          name="confirmPassword"
+                          component="div"
+                          className="text-danger small mt-1"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Terms and Conditions Checkbox */}
+                    <div className="form-check mb-3">
+                      <Field
+                        type="checkbox"
+                        name="agreeToTerms"
+                        id="agreeToTerms"
+                        className="form-check-input"
+                      />
+                      <label
+                        htmlFor="agreeToTerms"
+                        className="form-check-label small"
+                      >
+                        {t("register.agreeToTerms")}{" "}
+                        <a
+                          href="#"
+                          className="text-primary text-decoration-none"
+                        >
+                          {t("register.termsAndConditions")}
+                        </a>
+                      </label>
+                    </div>
                     <ErrorMessage
-                      name="email"
-                      component="div"
-                      className="text-danger small mt-1"
-                    />
-                  </div>
-
-                  {/* Terms and Conditions Checkbox */}
-                  <div className="form-check mb-3">
-                    <Field
-                      type="checkbox"
                       name="agreeToTerms"
-                      id="agreeToTerms"
-                      className="form-check-input"
+                      component="div"
+                      className="text-danger small mb-3"
                     />
-                    <label
-                      htmlFor="agreeToTerms"
-                      className="form-check-label small"
-                    >
-                      {t("register.agreeToTerms")}{" "}
-                      <a href="#" className="text-primary text-decoration-none">
-                        {t("register.termsAndConditions")}
-                      </a>
-                    </label>
-                  </div>
-                  <ErrorMessage
-                    name="agreeToTerms"
-                    component="div"
-                    className="text-danger small mb-3"
-                  />
 
-                  <button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className="btn btn-primary w-100 py-2 fw-bold"
-                  >
-                    {t("register.registerButton")}
-                  </button>
-                </Form>
-              )}
+                    <button
+                      type="submit"
+                      disabled={isSubmitting}
+                      className="btn btn-primary w-100 py-2 fw-bold"
+                      onClick={() => {
+                        console.log("Submit button clicked!");
+                        console.log("Form values:", values);
+                        console.log("Form errors:", errors);
+                        console.log("Is valid:", isValid);
+                        console.log("Is dirty:", dirty);
+                      }}
+                    >
+                      {isSubmitting ? (
+                        <>
+                          <span className="spinner-border spinner-border-sm me-2" />
+                          {t("register.submitting")}
+                        </>
+                      ) : (
+                        t("register.registerButton")
+                      )}
+                    </button>
+                  </Form>
+                );
+              }}
             </Formik>
 
             {/* Footer Links */}

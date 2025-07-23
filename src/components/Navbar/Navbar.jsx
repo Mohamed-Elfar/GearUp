@@ -5,6 +5,8 @@ import TransButton from "../TransButton";
 import logo from "../../assets/logo.png";
 import Button from "../Button/Button";
 import styles from "./Navbar.module.css";
+import { useAuthStore } from "../../stores/authStore";
+import VerificationBadge from "../Profile/VerificationBadge";
 
 // Lazy load modal components for better performance
 const LoginModal = React.lazy(() => import("../LoginModal/LoginModal"));
@@ -14,9 +16,16 @@ const RegisterModal = React.lazy(() =>
 
 const Navbar = memo(() => {
   const { t } = useTranslation();
+  const { user, isAuthenticated, signOut, initializeAuth } = useAuthStore();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
+  const [showUserDropdown, setShowUserDropdown] = useState(false);
+
+  // Initialize auth on component mount
+  React.useEffect(() => {
+    initializeAuth();
+  }, [initializeAuth]);
 
   const openLoginModal = useCallback(() => {
     setIsRegisterModalOpen(false);
@@ -36,6 +45,19 @@ const Navbar = memo(() => {
   const toggleMobileMenu = useCallback(() => {
     setIsMenuOpen((prev) => !prev);
   }, []);
+
+  const toggleUserDropdown = useCallback(() => {
+    setShowUserDropdown((prev) => !prev);
+  }, []);
+
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+      setShowUserDropdown(false);
+    } catch (error) {
+      console.error("Sign out error:", error);
+    }
+  };
 
   return (
     <nav
@@ -132,17 +154,81 @@ const Navbar = memo(() => {
           {/* Right side - Desktop */}
           <div className="d-none d-lg-flex align-items-center gap-3">
             <TransButton />
-            <button
-              onClick={openLoginModal}
-              className={`btn btn-link text-white fw-medium text-decoration-none px-2 ${styles.loginButton}`}
-            >
-              {t("navbar.login")}
-            </button>
-            <Button
-              label={t("navbar.joinUs")}
-              padding="0 40px"
-              handleClick={openRegisterModal}
-            />
+            {isAuthenticated ? (
+              /* User Menu */
+              <div className="dropdown">
+                <button
+                  onClick={toggleUserDropdown}
+                  className="btn btn-link text-white fw-medium text-decoration-none px-2 d-flex align-items-center gap-2"
+                  style={{ border: "none", background: "none" }}
+                >
+                  <div className="d-flex align-items-center gap-2">
+                    <div
+                      className="bg-white rounded-circle d-flex align-items-center justify-content-center"
+                      style={{ width: "32px", height: "32px" }}
+                    >
+                      <i className="bi bi-person-fill text-primary"></i>
+                    </div>
+                    <span>{user?.first_name || "User"}</span>
+                    <VerificationBadge user={user} size="sm" />
+                    <i
+                      className={`bi bi-chevron-${
+                        showUserDropdown ? "up" : "down"
+                      }`}
+                    ></i>
+                  </div>
+                </button>
+                {showUserDropdown && (
+                  <div
+                    className="dropdown-menu show position-absolute end-0 mt-2"
+                    style={{ minWidth: "200px" }}
+                  >
+                    <div className="px-3 py-2 border-bottom">
+                      <div className="d-flex justify-content-between align-items-center">
+                        <div>
+                          <div className="fw-semibold">
+                            {user?.first_name} {user?.last_name}
+                          </div>
+                          <div className="small text-muted">{user?.email}</div>
+                        </div>
+                        <VerificationBadge user={user} size="md" />
+                      </div>
+                    </div>
+                    <NavLink
+                      to="/home/profile"
+                      className="dropdown-item d-flex align-items-center gap-2"
+                      onClick={() => setShowUserDropdown(false)}
+                    >
+                      <i className="bi bi-person"></i>
+                      Profile
+                    </NavLink>
+                    <div className="dropdown-divider"></div>
+                    <button
+                      onClick={handleSignOut}
+                      className="dropdown-item d-flex align-items-center gap-2 text-danger"
+                    >
+                      <i className="bi bi-box-arrow-right"></i>
+                      Sign Out
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              /* Login/Register Buttons */
+              <>
+                <button
+                  onClick={openLoginModal}
+                  className={`btn btn-link text-white fw-medium text-decoration-none px-2 ${styles.loginButton}`}
+                >
+                  {t("navbar.login")}
+                </button>
+                <Button
+                  label={t("navbar.joinUs")}
+                  padding="0 40px"
+                  handleClick={openRegisterModal}
+                />
+              </>
+            )}
           </div>
 
           {/* Mobile menu button */}
@@ -225,28 +311,62 @@ const Navbar = memo(() => {
                   <TransButton mobileStyle={true} />
                 </div>
                 <div className="d-flex flex-column w-100">
-                  <button
-                    onClick={() => {
-                      setIsMenuOpen(false);
-                      openLoginModal();
-                    }}
-                    className={`btn text-white fw-medium ${styles.mobileLoginButton}`}
-                    type="button"
-                    aria-label="Login to your account"
-                  >
-                    {t("navbar.login")}
-                  </button>
-                  <div className={styles.mobileJoinButton}>
-                    <Button
-                      label={t("navbar.joinUs")}
-                      customClasses={`btn btn-primary fw-bold ${styles.mobileJoinButtonStyled}`}
-                      handleClick={() => {
-                        openRegisterModal();
-                        setIsMenuOpen(false);
-                      }}
-                      aria-label="Join our platform"
-                    />
-                  </div>
+                  {isAuthenticated ? (
+                    /* Mobile User Menu */
+                    <>
+                      <div className="text-white mb-3 px-3">
+                        <div className="fw-semibold">
+                          {user?.first_name} {user?.last_name}
+                        </div>
+                        <div className="small text-muted">{user?.email}</div>
+                      </div>
+                      <NavLink
+                        to="/home/profile"
+                        className="btn text-white fw-medium text-start mb-2"
+                        onClick={() => setIsMenuOpen(false)}
+                      >
+                        <i className="bi bi-person me-2"></i>
+                        Profile
+                      </NavLink>
+                      <button
+                        onClick={() => {
+                          setIsMenuOpen(false);
+                          handleSignOut();
+                        }}
+                        className="btn text-danger fw-medium text-start"
+                        type="button"
+                      >
+                        <i className="bi bi-box-arrow-right me-2"></i>
+                        Sign Out
+                      </button>
+                    </>
+                  ) : (
+                    /* Mobile Login/Register */
+                    <>
+                      <button
+                        onClick={() => {
+                          setIsMenuOpen(false);
+                          openLoginModal();
+                        }}
+                        className={`btn text-white fw-medium ${styles.mobileLoginButton}`}
+                        type="button"
+                        aria-label="Login to your account"
+                      >
+                        {t("navbar.login")}
+                      </button>
+                      <div className={styles.mobileJoinButton}>
+                        <Button
+                          label={t("navbar.joinUs")}
+                          customClasses={`btn btn-primary fw-bold ${styles.mobileJoinButtonStyled}`}
+                          handleClick={() => {
+                            openRegisterModal();
+                            setIsMenuOpen(false);
+                          }}
+                          aria-label="Join our platform"
+                        />
+                      </div>
+                    </>
+                  )}
                 </div>
               </div>
             </div>
