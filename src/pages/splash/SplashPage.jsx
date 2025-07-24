@@ -1,20 +1,35 @@
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuthStore } from "../../stores/authStore";
 import logoImage from "../../assets/spinnerLogo.png";
 import "./SplashPage.css";
 
 export default function SplashPage() {
   const navigate = useNavigate();
+  const { user, isAuthenticated, authLoading } = useAuthStore();
 
   useEffect(() => {
-    // Redirect to home page after 4 seconds
-    const timer = setTimeout(() => {
-      navigate("/home");
-    }, 4000);
+    // If already authenticated, redirect immediately based on role
+    if (isAuthenticated && user) {
+      console.log("User already authenticated:", user);
+      if (user.role === 'admin') {
+        navigate("/admin");
+      } else {
+        navigate("/home");
+      }
+      return;
+    }
 
-    // Cleanup timer if component unmounts
-    return () => clearTimeout(timer);
-  }, [navigate]);
+    // If not authenticated and auth is not loading, redirect to home after 4 seconds
+    if (!authLoading) {
+      const timer = setTimeout(() => {
+        navigate("/home");
+      }, 4000);
+
+      // Cleanup timer if component unmounts
+      return () => clearTimeout(timer);
+    }
+  }, [navigate, isAuthenticated, user, authLoading]);
 
   return (
     <div className="splash-container">

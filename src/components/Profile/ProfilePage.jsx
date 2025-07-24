@@ -7,6 +7,45 @@ import VerificationBadge from "./VerificationBadge";
 export default function ProfilePage() {
   const { user } = useAuthStore();
 
+  // Debug: Log user data to see what's happening
+  console.log("ProfilePage - Current user:", user);
+  console.log("ProfilePage - User role:", user?.role);
+  console.log("ProfilePage - Is admin?", user?.role === 'admin');
+
+  // Admin users don't need profile verification
+  if (user?.role === 'admin') {
+    return (
+      <div className="container py-5">
+        <div className="row justify-content-center">
+          <div className="col-lg-8">
+            <div className="card shadow-lg border-0">
+              <div className="card-header bg-success text-white text-center">
+                <h2 className="h4 mb-0">
+                  <i className="bi bi-shield-check me-2"></i>
+                  Admin Dashboard
+                </h2>
+              </div>
+              <div className="card-body text-center p-5">
+                <h3>Welcome, Administrator!</h3>
+                <p className="text-muted mb-4">Access your admin tools to manage user approvals and system oversight.</p>
+                <div className="d-flex gap-3 justify-content-center">
+                  <a href="/admin" className="btn btn-primary btn-lg">
+                    <i className="bi bi-people me-2"></i>
+                    Approval Requests
+                  </a>
+                  <a href="/map" className="btn btn-outline-secondary">
+                    <i className="bi bi-geo-alt me-2"></i>
+                    Map Search
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   // Check if user needs to complete profile verification
   const needsProfileCompletion = !user?.phone_number || !user?.role;
 

@@ -319,13 +319,6 @@ export default function ProfileVerification() {
   const handleSubmit = async (values) => {
     setIsSubmitting(true);
     try {
-      console.log("=== PROFILE UPDATE DEBUG START ===");
-      console.log("Profile verification data:", values);
-      console.log("Current user:", user);
-      console.log("Is authenticated:", !!user);
-      console.log("User ID:", user?.id);
-      console.log("User role:", userRole);
-
       // Prepare the update object based on user's existing role
       const updateData = {
         phone_number: values.phoneNumber,
@@ -333,9 +326,6 @@ export default function ProfileVerification() {
 
       // Add role-specific data based on user's existing role
       if (userRole === "seller") {
-        console.log("Processing seller data...");
-        console.log("ID Card Number from form:", values.idCardNumber);
-
         if (!values.idCardNumber || values.idCardNumber.trim() === "") {
           alert(
             "ID Card Number is required for sellers. Please enter your national ID card number."
@@ -360,25 +350,6 @@ export default function ProfileVerification() {
           updateData.latitude = values.serviceCoordinates.latitude;
           updateData.longitude = values.serviceCoordinates.longitude;
         }
-      }
-
-      console.log("Update data being sent:", updateData);
-
-      // Note: File upload handling will be implemented later
-      // For now, we'll skip the file uploads to avoid database errors
-      if (values.idCard) {
-        console.log("ID Card file selected:", values.idCard.name);
-        // TODO: Implement file upload to Supabase storage
-        // updateData.id_card_url = "uploaded_id_card_url";
-      }
-
-      if (values.businessLicense) {
-        console.log(
-          "Business License file selected:",
-          values.businessLicense.name
-        );
-        // TODO: Implement file upload to Supabase storage
-        // updateData.business_license_url = "uploaded_license_url";
       }
 
       // Call the auth store to update profile

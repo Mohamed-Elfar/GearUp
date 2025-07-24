@@ -190,18 +190,34 @@ export const useAuthStore = create((set, get) => ({
   // Helper function to check if user needs profile completion
   needsProfileCompletion: () => {
     const { user } = get();
-    if (!user) return false;
+    console.log("needsProfileCompletion - checking user:", user);
+    
+    if (!user) {
+      console.log("needsProfileCompletion - no user found");
+      return false;
+    }
+
+    // Admin users never need profile completion
+    if (user.role === 'admin') {
+      console.log("needsProfileCompletion - admin user, no completion needed");
+      return false;
+    }
 
     // Check basic profile completion
     const hasBasicInfo = user.phone_number && user.role;
+    console.log("needsProfileCompletion - hasBasicInfo:", hasBasicInfo);
 
     // For sellers and service providers, also check for ID card
     if (user.role === "seller" || user.role === "service_provider") {
-      return !hasBasicInfo || !user.id_card_image;
+      const needsCompletion = !hasBasicInfo || !user.id_card_image;
+      console.log("needsProfileCompletion - seller/service provider needs completion:", needsCompletion);
+      return needsCompletion;
     }
 
     // For customers, only need basic info
-    return !hasBasicInfo;
+    const needsCompletion = !hasBasicInfo;
+    console.log("needsProfileCompletion - customer needs completion:", needsCompletion);
+    return needsCompletion;
   },
 
   // Helper function to get user verification level
@@ -325,6 +341,25 @@ export const useAuthStore = create((set, get) => ({
         }
       }
 
+      // Create approval request for sellers and service providers
+      if (user.role === "seller" || user.role === "service_provider") {
+        console.log("Creating approval request...");
+        const { error: approvalError } = await supabase
+          .from("approval_requests")
+          .insert({
+            user_id: user.id,
+            role_requested: user.role,
+            status: "pending"
+          });
+
+        if (approvalError) {
+          console.error("Error creating approval request:", approvalError);
+          // Don't throw error here, just log it as the profile update was successful
+        } else {
+          console.log("Approval request created successfully");
+        }
+      }
+
       // Update local state with the new user data
       if (userData) {
         set((state) => ({
@@ -335,6 +370,134 @@ export const useAuthStore = create((set, get) => ({
       return { data: userData, error: null };
     } catch (error) {
       console.error("Profile update error:", error);
+      return { data: null, error };
+    }
+  },
+
+  // Get all pending approval requests (for admin use)
+  getApprovalRequests: async (status = 'pending') => {
+    try {
+      console.log("Fetching approval requests with status:", status);
+      
+      // First, get the basic approval requests
+      const { data: approvalData, error: approvalError } = await supabase
+        .from("approval_requests")
+        .select("*")
+        .eq("status", status)
+        .order("created_at", { ascending: false });
+
+      if (approvalError) {
+        console.error("Error fetching approval requests:", approvalError);
+        return { data: null, error: approvalError };
+      }
+
+      console.log("Raw approval requests:", approvalData);
+
+      // If no data, return empty array
+      if (!approvalData || approvalData.length === 0) {
+        return { data: [], error: null };
+      }
+
+      // For each approval request, manually fetch the user data
+      const enrichedData = await Promise.all(
+        approvalData.map(async (request) => {
+          try {
+            // Fetch user data separately
+            const { data: userData, error: userError } = await supabase
+              .from("users")
+              .select("id, first_name, last_name, email, phone_number, created_at")
+              .eq("id", request.user_id)
+              .single();
+
+            if (userError) {
+              console.error(`Error fetching user ${request.user_id}:`, userError);
+              return request; // Return request without user data if user fetch fails
+            }
+
+            // Fetch role-specific data
+            let roleData = null;
+            if (request.role_requested === 'seller') {
+              const { data: sellerData } = await supabase
+                .from("sellers")
+                .select("shop_name, shop_address, id_card_number, latitude, longitude")
+                .eq("user_id", request.user_id)
+                .single();
+              roleData = { sellers: sellerData };
+            } else if (request.role_requested === 'service_provider') {
+              const { data: serviceData } = await supabase
+                .from("service_providers")
+                .select("service_address, specializations, latitude, longitude")
+                .eq("user_id", request.user_id)
+                .single();
+              roleData = { service_providers: serviceData };
+            }
+
+            return {
+              ...request,
+              users: userData,
+              ...roleData
+            };
+          } catch (error) {
+            console.error(`Error processing request ${request.id}:`, error);
+            return request; // Return basic request data if enrichment fails
+          }
+        })
+      );
+
+      console.log("Enriched approval requests:", enrichedData);
+      return { data: enrichedData, error: null };
+    } catch (error) {
+      console.error("Error in getApprovalRequests:", error);
+      return { data: null, error };
+    }
+  },
+
+  // Approve or reject an approval request (for admin use)
+  reviewApprovalRequest: async (requestId, status, notes = "", adminId) => {
+    try {
+      const { data, error } = await supabase
+        .from("approval_requests")
+        .update({
+          status,
+          reviewed_by: adminId,
+          reviewed_at: new Date().toISOString(),
+          notes
+        })
+        .eq("id", requestId)
+        .select()
+        .single();
+
+      if (error) {
+        console.error("Error reviewing approval request:", error);
+        return { data: null, error };
+      }
+
+      // If approved, update the user's approval status in their role table
+      if (status === "approved" && data) {
+        const { user_id, role_requested } = data;
+        
+        if (role_requested === "seller") {
+          await supabase
+            .from("sellers")
+            .update({ 
+              is_approved: true,
+              approved_at: new Date().toISOString()
+            })
+            .eq("user_id", user_id);
+        } else if (role_requested === "service_provider") {
+          await supabase
+            .from("service_providers")
+            .update({ 
+              is_approved: true,
+              approved_at: new Date().toISOString()
+            })
+            .eq("user_id", user_id);
+        }
+      }
+
+      return { data, error: null };
+    } catch (error) {
+      console.error("Error in reviewApprovalRequest:", error);
       return { data: null, error };
     }
   },
