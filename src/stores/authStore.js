@@ -502,6 +502,63 @@ export const useAuthStore = create((set, get) => ({
     }
   },
 
+  // Clear approval status for reapplication (for rejected users)
+  clearApprovalForReapplication: async () => {
+    try {
+      const { user } = get();
+      if (!user) throw new Error("No authenticated user");
+
+      console.log("Clearing approval status for reapplication...");
+
+      // Delete the existing approval request so user can resubmit
+      const { error: deleteError } = await supabase
+        .from("approval_requests")
+        .delete()
+        .eq("user_id", user.id)
+        .eq("role_requested", user.role);
+
+      if (deleteError) {
+        console.error("Error deleting approval request:", deleteError);
+        return { data: null, error: deleteError };
+      }
+
+      // Clear approval status from role-specific table
+      if (user.role === "seller") {
+        await supabase
+          .from("sellers")
+          .update({ 
+            is_approved: false,
+            approved_at: null
+          })
+          .eq("user_id", user.id);
+      } else if (user.role === "service_provider") {
+        await supabase
+          .from("service_providers")
+          .update({ 
+            is_approved: false,
+            approved_at: null
+          })
+          .eq("user_id", user.id);
+      }
+
+      // Update local user state to remove approval status
+      set((state) => ({
+        user: {
+          ...state.user,
+          approval_status: null,
+          approval_notes: null,
+          reviewed_at: null
+        }
+      }));
+
+      console.log("Approval status cleared successfully");
+      return { data: true, error: null };
+    } catch (error) {
+      console.error("Error clearing approval status:", error);
+      return { data: null, error };
+    }
+  },
+
   initializeAuth: async () => {
     try {
       console.log("Initializing auth...");

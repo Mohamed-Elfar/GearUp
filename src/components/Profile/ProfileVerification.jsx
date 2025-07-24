@@ -19,6 +19,9 @@ export default function ProfileVerification() {
   const [locationError, setLocationError] = useState("");
   const [locationSuccess, setLocationSuccess] = useState(false);
   const [permissionStatus, setPermissionStatus] = useState("unknown"); // unknown, granted, denied, prompt
+  
+  // Check if this is a reapplication
+  const isReapplication = new URLSearchParams(window.location.search).get('reapply') === 'true';
 
   // Check permission status on component mount
   useEffect(() => {
@@ -392,12 +395,43 @@ export default function ProfileVerification() {
         <div className="col-lg-8">
           <div className="card shadow-lg border-0">
             <div className="card-header bg-primary text-white text-center py-4">
-              <h2 className="h3 mb-0">{t("profile.verification.title")}</h2>
-              <p className="mb-0 opacity-75">
-                {t("profile.verification.subtitle")}
-              </p>
+              {isReapplication ? (
+                <>
+                  <h2 className="h3 mb-0">
+                    <i className="bi bi-arrow-clockwise me-2"></i>
+                    Resubmit Verification
+                  </h2>
+                  <p className="mb-0 opacity-75">
+                    Please update your information and documents based on the feedback provided
+                  </p>
+                </>
+              ) : (
+                <>
+                  <h2 className="h3 mb-0">{t("profile.verification.title")}</h2>
+                  <p className="mb-0 opacity-75">
+                    {t("profile.verification.subtitle")}
+                  </p>
+                </>
+              )}
             </div>
             <div className="card-body p-4">
+              {/* Reapplication Notice */}
+              {isReapplication && (
+                <div className="alert alert-warning mb-4" role="alert">
+                  <h6 className="alert-heading">
+                    <i className="bi bi-exclamation-triangle me-2"></i>
+                    Resubmission Required
+                  </h6>
+                  <p className="mb-2">
+                    Your previous verification was not approved. Please review the feedback 
+                    and update your information accordingly.
+                  </p>
+                  <small className="text-muted">
+                    <strong>Tip:</strong> Make sure all documents are clear, readable, and meet our requirements.
+                  </small>
+                </div>
+              )}
+              
               {/* Progress Indicator */}
               <div className="mb-4">
                 <div className="d-flex justify-content-between align-items-center mb-2">

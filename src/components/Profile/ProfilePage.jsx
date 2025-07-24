@@ -3,6 +3,8 @@ import React from "react";
 import { useAuthStore } from "../../stores/authStore";
 import ProfileVerification from "./ProfileVerification";
 import VerificationBadge from "./VerificationBadge";
+import PendingApprovalPage from "./PendingApprovalPage";
+import RejectedApprovalPage from "./RejectedApprovalPage";
 
 export default function ProfilePage() {
   const { user } = useAuthStore();
@@ -11,6 +13,10 @@ export default function ProfilePage() {
   console.log("ProfilePage - Current user:", user);
   console.log("ProfilePage - User role:", user?.role);
   console.log("ProfilePage - Is admin?", user?.role === 'admin');
+  console.log("ProfilePage - Approval status:", user?.approval_status);
+  console.log("ProfilePage - Phone number:", user?.phone_number);
+  console.log("ProfilePage - ID card:", user?.id_card_image);
+  console.log("ProfilePage - Full user object:", JSON.stringify(user, null, 2));
 
   // Admin users don't need profile verification
   if (user?.role === 'admin') {
@@ -49,14 +55,60 @@ export default function ProfilePage() {
   // Check if user needs to complete profile verification
   const needsProfileCompletion = !user?.phone_number || !user?.role;
 
-  // For sellers and service providers, also check for required fields
-  const needsIdVerification =
-    (user?.role === "seller" || user?.role === "service_provider") &&
-    (!user?.id_card_image ||
-      (user?.role === "seller" && !user?.id_card_number));
-
-  if (needsProfileCompletion || needsIdVerification) {
-    return <ProfileVerification />;
+  // For sellers and service providers, check approval status first
+  if (user?.role === "seller" || user?.role === "service_provider") {
+    console.log("Processing seller/service provider logic");
+    console.log("needsProfileCompletion:", needsProfileCompletion);
+    console.log("user.approval_status:", user?.approval_status);
+    
+    // If basic profile is incomplete, show verification form
+    if (needsProfileCompletion) {
+      console.log("Showing verification form - basic profile incomplete");
+      return <ProfileVerification />;
+    }
+    
+    // If basic profile is complete, check for business verification
+    const needsIdVerification = !user?.id_card_image || 
+      (user?.role === "seller" && !user?.id_card_number);
+    
+    console.log("needsIdVerification:", needsIdVerification);
+    
+    // If business verification is incomplete AND no approval status, show verification form
+    if (needsIdVerification && !user?.approval_status) {
+      console.log("Showing verification form - business verification incomplete and no approval status");
+      return <ProfileVerification />;
+    }
+    
+    // Handle approval statuses - regardless of verification completion
+    if (user?.approval_status === "pending") {
+      console.log("Showing pending approval page");
+      return <PendingApprovalPage user={user} />;
+    }
+    
+    if (user?.approval_status === "rejected") {
+      console.log("Showing rejected approval page");
+      return <RejectedApprovalPage user={user} />;
+    }
+    
+    // If approved, show normal profile even if some verification is missing
+    if (user?.approval_status === "approved") {
+      console.log("User approved - showing normal profile");
+      // Continue to normal profile page
+    }
+    
+    // If no approval status but verification complete, show normal profile
+    // If no approval status and verification incomplete, user needs to complete verification
+    if (!user?.approval_status && needsIdVerification) {
+      console.log("No approval status and verification incomplete - showing verification form");
+      return <ProfileVerification />;
+    }
+    
+  } else {
+    // For customers, only check basic profile completion
+    if (needsProfileCompletion) {
+      console.log("Customer needs profile completion");
+      return <ProfileVerification />;
+    }
   }
 
   return (
@@ -105,25 +157,61 @@ export default function ProfilePage() {
               <div className="mb-4">
                 <h6 className="text-muted mb-1">Verification Status</h6>
                 <div className="d-flex align-items-center">
-                  {user?.verification_status === "verified" && (
+                  {user?.approval_status === "approved" && (
                     <span className="badge bg-success">
                       <i className="bi bi-check-circle me-1"></i>
-                      Verified
+                      Approved & Verified
                     </span>
                   )}
-                  {user?.verification_status === "pending" && (
+                  {user?.approval_status === "pending" && (
                     <span className="badge bg-warning">
                       <i className="bi bi-clock me-1"></i>
                       Under Review
                     </span>
                   )}
-                  {user?.verification_status === "rejected" && (
+                  {user?.approval_status === "rejected" && (
                     <span className="badge bg-danger">
                       <i className="bi bi-x-circle me-1"></i>
                       Rejected
                     </span>
                   )}
+                  {!user?.approval_status && (user?.role === "customer") && (
+                    <span className="badge bg-primary">
+                      <i className="bi bi-check-circle me-1"></i>
+                      Verified
+                    </span>
+                  )}
+                  {!user?.approval_status && (user?.role === "seller" || user?.role === "service_provider") && (
+                    <span className="badge bg-secondary">
+                      <i className="bi bi-info-circle me-1"></i>
+                      Complete Profile to Get Verified
+                    </span>
+                  )}
                 </div>
+                
+                {/* Show additional approval information */}
+                {user?.approval_status && user?.reviewed_at && (
+                  <div className="mt-2">
+                    <small className="text-muted">
+                      {user.approval_status === "approved" ? "Approved" : 
+                       user.approval_status === "rejected" ? "Rejected" : "Submitted"} on{" "}
+                      {new Date(user.reviewed_at).toLocaleDateString("en-US", {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                      })}
+                    </small>
+                  </div>
+                )}
+                
+                {/* Show rejection notes if applicable */}
+                {user?.approval_status === "rejected" && user?.approval_notes && (
+                  <div className="alert alert-danger mt-2" role="alert">
+                    <small>
+                      <strong>Rejection Reason:</strong> {user.approval_notes}
+                    </small>
+                  </div>
+                )}
               </div>
 
               {/* Business Info for Sellers/Service Providers */}
@@ -180,11 +268,20 @@ export default function ProfilePage() {
                   <i className="bi bi-pencil me-2"></i>
                   Edit Profile
                 </button>
-                {user?.verification_status === "rejected" && (
-                  <button className="btn btn-warning">
+                {user?.approval_status === "rejected" && (
+                  <button 
+                    className="btn btn-warning"
+                    onClick={() => window.location.href = "/home/profile?reapply=true"}
+                  >
                     <i className="bi bi-arrow-clockwise me-2"></i>
-                    Resubmit Verification
+                    Reapply for Verification
                   </button>
+                )}
+                {user?.approval_status === "approved" && (
+                  <span className="badge bg-success-subtle text-success fs-6 px-3 py-2">
+                    <i className="bi bi-patch-check me-2"></i>
+                    Fully Verified Business
+                  </span>
                 )}
               </div>
             </div>

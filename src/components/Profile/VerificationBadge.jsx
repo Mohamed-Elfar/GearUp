@@ -7,14 +7,27 @@ export default function VerificationBadge({ user, size = "sm" }) {
   const hasPhone = !!user.phone_number;
   const hasIdCard = !!user.id_card_image;
   const role = user.role;
+  const approvalStatus = user.approval_status;
 
   // Determine verification level
   let verificationLevel = "none";
   if (role === "customer") {
     if (hasPhone) verificationLevel = "verified";
   } else if (role === "seller" || role === "service_provider") {
-    if (hasPhone && hasIdCard) verificationLevel = "fully_verified";
-    else if (hasPhone) verificationLevel = "verified";
+    // For sellers and service providers, check approval status
+    if (hasPhone && hasIdCard) {
+      if (approvalStatus === "approved") {
+        verificationLevel = "fully_verified";
+      } else if (approvalStatus === "pending") {
+        verificationLevel = "pending";
+      } else if (approvalStatus === "rejected") {
+        verificationLevel = "rejected";
+      } else {
+        verificationLevel = "verified"; // Profile complete but no approval status
+      }
+    } else if (hasPhone) {
+      verificationLevel = "verified";
+    }
   }
 
   // Size configurations
@@ -60,10 +73,23 @@ export default function VerificationBadge({ user, size = "sm" }) {
     <div className={config.container}>
       {verificationLevel === "verified" &&
         renderBadge("Phone", "#007bff", "check-circle-fill")}
+      {verificationLevel === "pending" && (
+        <>
+          {renderBadge("Phone", "#007bff", "check-circle-fill")}
+          {renderBadge("Under Review", "#ffc107", "clock")}
+        </>
+      )}
+      {verificationLevel === "rejected" && (
+        <>
+          {renderBadge("Phone", "#007bff", "check-circle-fill")}
+          {renderBadge("Rejected", "#dc3545", "x-circle")}
+        </>
+      )}
       {verificationLevel === "fully_verified" && (
         <>
           {renderBadge("Phone", "#007bff", "check-circle-fill")}
           {renderBadge("ID Card", "#28a745", "shield-check")}
+          {renderBadge("Approved", "#198754", "patch-check-fill")}
         </>
       )}
     </div>
