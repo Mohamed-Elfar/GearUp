@@ -1,11 +1,32 @@
 import React, { useState, useRef } from "react";
 
-export default function SellerDashboard() {
+export function SellerDashboard() {
   const [activeTab, setActiveTab] = useState("dashboard");
   const [productImages, setProductImages] = useState([]);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarExpanded, setSidebarExpanded] = useState(true); // NEW: expanded/collapsed state
   const fileInputRef = useRef(null);
+
+  // Add this state at the top of your component:
+  const [productForm, setProductForm] = useState({
+    name: "",
+    type: "",
+    category: "",
+    car_make: "",
+    car_model: "",
+    car_year: "",
+    images: "",
+    brand: "",
+    part_number: "",
+    price: "",
+    stock: "",
+    description: "",
+    spec_material: "",
+    spec_dimensions: "",
+    spec_compatibility: "",
+    availability: "",
+    warranty: "",
+  });
 
   // Sample data for dashboard stats with icons
   const stats = [
@@ -137,6 +158,69 @@ export default function SellerDashboard() {
     setProductImages([]);
   };
 
+  const handleProductInput = (e) => {
+    const { name, value } = e.target;
+    setProductForm((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleProductSubmit = (e) => {
+    e.preventDefault();
+    // Build the object as required
+    const productObj = {
+      name: productForm.name,
+      type: productForm.type,
+      category: productForm.category,
+      car: [
+        {
+          make: productForm.car_make,
+          model: productForm.car_model,
+          year: productForm.car_year
+            .split(",")
+            .map((y) => parseInt(y.trim()))
+            .filter(Boolean),
+        },
+      ],
+      images: productForm.images.split(",").map((img) => img.trim()),
+      brand: productForm.brand,
+      part_number: productForm.part_number,
+      price: parseFloat(productForm.price),
+      stock: parseInt(productForm.stock),
+      description: productForm.description,
+      specifications: {
+        material: productForm.spec_material,
+        dimensions: productForm.spec_dimensions,
+        compatibility: productForm.spec_compatibility,
+      },
+      availability: productForm.availability,
+      warranty: productForm.warranty,
+    };
+    // For now, just log it (replace with your Supabase call)
+    console.log(productObj);
+    alert("Product object created! Check console.");
+    setProductForm({
+      name: "",
+      type: "",
+      category: "",
+      car_make: "",
+      car_model: "",
+      car_year: "",
+      images: "",
+      brand: "",
+      part_number: "",
+      price: "",
+      stock: "",
+      description: "",
+      spec_material: "",
+      spec_dimensions: "",
+      spec_compatibility: "",
+      availability: "",
+      warranty: "",
+    });
+  };
+
   const getStatusBadgeClass = (status) => {
     switch (status) {
       case "Cancelled":
@@ -151,7 +235,7 @@ export default function SellerDashboard() {
   };
 
   // Sidebar width and label visibility based on expanded state
-  const sidebarWidth = sidebarExpanded ? "220px" : "64px";
+  const sidebarWidth = sidebarExpanded ? "250px" : "64px";
   const showLabels = sidebarExpanded;
 
   return (
@@ -165,12 +249,13 @@ export default function SellerDashboard() {
         href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.0/font/bootstrap-icons.css"
         rel="stylesheet"
       />
-
       <style>{`
         .seller-dashboard {
           min-height: 100vh;
           background-color: #f8f9fa;
         }
+          nav>div {
+          padding: 0}
         .sidebar {
           background-color: #212529;
           transition: all 0.3s;
@@ -179,7 +264,7 @@ export default function SellerDashboard() {
           position: relative;
         }
         .sidebar .nav-link {
-          padding: 0.75rem 1rem;
+          padding: 15px;
           border-radius: 0.25rem;
           margin: 0 0.5rem;
           transition: all 0.2s;
@@ -217,7 +302,10 @@ export default function SellerDashboard() {
         .sidebar-toggle-btn:hover {
           background: #495057;
         }
-        @media (max-width: 767.98px) {
+        .sidebar-overlay {
+          display: none;
+        }
+        @media (max-width: 991.98px) {
           .sidebar {
             position: fixed;
             top: 0;
@@ -228,6 +316,16 @@ export default function SellerDashboard() {
             overflow-y: auto;
             transition: left 0.3s ease;
           }
+          .sidebar-overlay {
+            display: ${sidebarOpen ? "block" : "none"};
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0,0,0,0.3);
+            z-index: 1040;
+          }
         }
         .main-content {
           padding-top: 1rem;
@@ -235,14 +333,36 @@ export default function SellerDashboard() {
           transition: margin-left 0.3s;
           margin-left: ${sidebarExpanded ? "220px" : "64px"};
         }
-        @media (max-width: 767.98px) {
+        @media (max-width: 991.98px) {
           .main-content {
             margin-left: 0;
             width: 100%;
+            padding-left: 1rem;
+            padding-right: 1rem;
           }
         }
+        /* Enhance form responsiveness */
+        @media (max-width: 767.98px) {
+          .card .row.g-3 > .col-md-6,
+          .card .row.g-3 > .col-md-4,
+          .card .row.g-3 > .col-md-3,
+          .card .row.g-3 > .col-md-2 {
+            flex: 0 0 100%;
+            max-width: 100%;
+          }
+          .card .row.g-3 {
+            row-gap: 1rem;
+          }
+          .main-content {
+            padding-left: 0.5rem;
+            padding-right: 0.5rem;
+          }
+        }
+        /* Make image previews wrap nicely on mobile */
+        .d-flex.flex-wrap.gap-2 {
+          gap: 0.5rem !important;
+        }
       `}</style>
-
       <div className="seller-dashboard">
         {/* Mobile Header */}
         <header className="d-md-none bg-dark text-white p-3">
@@ -559,101 +679,360 @@ export default function SellerDashboard() {
                     <i className="bi bi-plus-circle me-2 text-primary fs-3"></i>
                     <h2 className="mb-0">Add New Product</h2>
                   </div>
-
-                  <form onSubmit={handleFormSubmit}>
-                    <div className="mb-3">
-                      <label className="form-label">Product Name</label>
-                      <input
-                        type="text"
-                        className="form-control"
-                        name="productName"
-                        required
-                      />
-                    </div>
-                    <div className="mb-3">
-                      <label className="form-label">SKU</label>
-                      <input
-                        type="text"
-                        className="form-control"
-                        name="sku"
-                        required
-                      />
-                    </div>
-                    <div className="mb-3">
-                      <label className="form-label">Category</label>
-                      <input
-                        type="text"
-                        className="form-control"
-                        name="category"
-                        required
-                      />
-                    </div>
-                    <div className="mb-3">
-                      <label className="form-label">Price</label>
-                      <input
-                        type="number"
-                        className="form-control"
-                        name="price"
-                        step="0.01"
-                        required
-                      />
-                    </div>
-                    <div className="mb-3">
-                      <label className="form-label">Stock</label>
-                      <input
-                        type="number"
-                        className="form-control"
-                        name="stock"
-                        required
-                      />
-                    </div>
-                    <div className="mb-3">
-                      <label className="form-label">Status</label>
-                      <select className="form-select" name="status" required>
-                        <option value="Active">Active</option>
-                        <option value="Inactive">Inactive</option>
-                      </select>
-                    </div>
-                    <div className="mb-3">
-                      <label className="form-label">Product Images</label>
-                      <div className="d-flex flex-wrap gap-2">
-                        {productImages.map((image, index) => (
-                          <div key={index} className="position-relative">
-                            <img
-                              src={image.preview}
-                              alt={`Product Image ${index + 1}`}
-                              className="img-thumbnail"
-                              style={{ maxWidth: "150px", maxHeight: "150px" }}
-                            />
-                            <button
-                              type="button"
-                              className="btn-close position-absolute top-0 end-0"
-                              onClick={() => removeImage(index)}
-                              aria-label="Remove image"
-                            ></button>
+                  <form onSubmit={handleProductSubmit}>
+                    <div className="card mb-4 shadow-sm">
+                      <div className="card-header bg-light fw-bold">
+                        <i className="bi bi-info-circle me-2 text-primary"></i>
+                        Basic Info
+                      </div>
+                      <div className="card-body">
+                        <div className="row g-3">
+                          <div className="col-md-6">
+                            <label className="form-label">Name</label>
+                            <div className="input-group">
+                              <span className="input-group-text">
+                                <i className="bi bi-tag"></i>
+                              </span>
+                              <input
+                                type="text"
+                                className="form-control"
+                                name="name"
+                                value={productForm.name}
+                                onChange={handleProductInput}
+                                required
+                              />
+                            </div>
                           </div>
-                        ))}
-                        <button
-                          type="button"
-                          className="btn btn-outline-primary"
-                          onClick={triggerFileInput}
-                          disabled={productImages.length >= 10}
-                        >
-                          <i className="bi bi-plus"></i> Add Image
-                        </button>
-                        <input
-                          type="file"
-                          accept="image/*"
-                          multiple
-                          ref={fileInputRef}
-                          onChange={handleImageUpload}
-                          style={{ display: "none" }}
-                        />
+                          <div className="col-md-3">
+                            <label className="form-label">Type</label>
+                            <div className="input-group">
+                              <span className="input-group-text">
+                                <i className="bi bi-list-ul"></i>
+                              </span>
+                              <input
+                                type="text"
+                                className="form-control"
+                                name="type"
+                                value={productForm.type}
+                                onChange={handleProductInput}
+                                required
+                              />
+                            </div>
+                          </div>
+                          <div className="col-md-3">
+                            <label className="form-label">Category</label>
+                            <div className="input-group">
+                              <span className="input-group-text">
+                                <i className="bi bi-grid"></i>
+                              </span>
+                              <input
+                                type="text"
+                                className="form-control"
+                                name="category"
+                                value={productForm.category}
+                                onChange={handleProductInput}
+                                required
+                              />
+                            </div>
+                          </div>
+                        </div>
                       </div>
                     </div>
-                    <div className="mb-3">
-                      <button type="submit" className="btn btn-primary">
-                        <i className="bi bi-save"></i> Save Product
+
+                    <div className="card mb-4 shadow-sm">
+                      <div className="card-header bg-light fw-bold">
+                        <i className="bi bi-car-front me-2 text-primary"></i>
+                        Car Compatibility
+                      </div>
+                      <div className="card-body">
+                        <div className="row g-3">
+                          <div className="col-md-4">
+                            <label className="form-label">Car Make</label>
+                            <input
+                              type="text"
+                              className="form-control"
+                              name="car_make"
+                              value={productForm.car_make}
+                              onChange={handleProductInput}
+                              required
+                            />
+                          </div>
+                          <div className="col-md-4">
+                            <label className="form-label">Car Model</label>
+                            <input
+                              type="text"
+                              className="form-control"
+                              name="car_model"
+                              value={productForm.car_model}
+                              onChange={handleProductInput}
+                              required
+                            />
+                          </div>
+                          <div className="col-md-4">
+                            <label className="form-label">
+                              Car Years{" "}
+                              <span className="text-muted">
+                                (comma separated)
+                              </span>
+                            </label>
+                            <input
+                              type="text"
+                              className="form-control"
+                              name="car_year"
+                              value={productForm.car_year}
+                              onChange={handleProductInput}
+                              placeholder="e.g. 2018,2019,2020"
+                              required
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="card mb-4 shadow-sm">
+                      <div className="card-header bg-light fw-bold">
+                        <i className="bi bi-images me-2 text-primary"></i>
+                        Images
+                      </div>
+                      <div className="card-body">
+                        <label className="form-label">
+                          Images{" "}
+                          <span className="text-muted">
+                            (comma separated URLs or upload from device)
+                          </span>
+                        </label>
+                        <input
+                          type="text"
+                          className="form-control mb-2"
+                          name="images"
+                          value={productForm.images}
+                          onChange={handleProductInput}
+                          placeholder="Paste image URLs, separated by commas"
+                        />
+                        <div className="mb-2">
+                          <input
+                            type="file"
+                            accept="image/*"
+                            multiple
+                            ref={fileInputRef}
+                            style={{ display: "none" }}
+                            onChange={(e) => {
+                              const files = Array.from(e.target.files);
+                              files.forEach((file) => {
+                                if (productImages.length < 10) {
+                                  const reader = new FileReader();
+                                  reader.onload = (event) => {
+                                    setProductImages((prev) => [
+                                      ...prev,
+                                      { file, preview: event.target.result },
+                                    ]);
+                                    // Also update productForm.images with base64 string
+                                    setProductForm((prev) => ({
+                                      ...prev,
+                                      images: prev.images
+                                        ? prev.images +
+                                          "," +
+                                          event.target.result
+                                        : event.target.result,
+                                    }));
+                                  };
+                                  reader.readAsDataURL(file);
+                                }
+                              });
+                              // Reset input so same file can be uploaded again if needed
+                              e.target.value = "";
+                            }}
+                          />
+                          <button
+                            type="button"
+                            className="btn btn-outline-secondary"
+                            onClick={triggerFileInput}
+                          >
+                            <i className="bi bi-upload me-1"></i>Upload from
+                            device
+                          </button>
+                          <small className="text-muted ms-2">
+                            Max 10 images
+                          </small>
+                        </div>
+                        <div className="d-flex flex-wrap gap-2">
+                          {/* Show previews for both URLs and uploaded images */}
+                          {[
+                            ...productForm.images
+                              .split(",")
+                              .filter(Boolean)
+                              .map((img) => img.trim()),
+                            ...productImages
+                              .filter((imgObj) => imgObj.preview)
+                              .map((imgObj) => imgObj.preview),
+                          ]
+                            .filter(Boolean)
+                            .slice(0, 10)
+                            .map((img, idx) => (
+                              <img
+                                key={idx}
+                                src={img}
+                                alt="preview"
+                                style={{
+                                  width: 60,
+                                  height: 60,
+                                  objectFit: "cover",
+                                  borderRadius: 8,
+                                  border: "1px solid #eee",
+                                }}
+                              />
+                            ))}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="card mb-4 shadow-sm">
+                      <div className="card-header bg-light fw-bold">
+                        <i className="bi bi-box-seam me-2 text-primary"></i>
+                        Product Details
+                      </div>
+                      <div className="card-body">
+                        <div className="row g-3">
+                          <div className="col-md-4">
+                            <label className="form-label">Brand</label>
+                            <input
+                              type="text"
+                              className="form-control"
+                              name="brand"
+                              value={productForm.brand}
+                              onChange={handleProductInput}
+                              required
+                            />
+                          </div>
+                          <div className="col-md-4">
+                            <label className="form-label">Part Number</label>
+                            <input
+                              type="text"
+                              className="form-control"
+                              name="part_number"
+                              value={productForm.part_number}
+                              onChange={handleProductInput}
+                              required
+                            />
+                          </div>
+                          <div className="col-md-2">
+                            <label className="form-label">Price</label>
+                            <input
+                              type="number"
+                              className="form-control"
+                              name="price"
+                              value={productForm.price}
+                              onChange={handleProductInput}
+                              required
+                              min="0"
+                              step="0.01"
+                            />
+                          </div>
+                          <div className="col-md-2">
+                            <label className="form-label">Stock</label>
+                            <input
+                              type="number"
+                              className="form-control"
+                              name="stock"
+                              value={productForm.stock}
+                              onChange={handleProductInput}
+                              required
+                              min="0"
+                            />
+                          </div>
+                          <div className="col-12">
+                            <label className="form-label">Description</label>
+                            <textarea
+                              className="form-control"
+                              name="description"
+                              value={productForm.description}
+                              onChange={handleProductInput}
+                              rows={2}
+                              required
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="card mb-4 shadow-sm">
+                      <div className="card-header bg-light fw-bold">
+                        <i className="bi bi-gear me-2 text-primary"></i>
+                        Specifications
+                      </div>
+                      <div className="card-body">
+                        <div className="row g-3">
+                          <div className="col-md-4">
+                            <label className="form-label">Material</label>
+                            <input
+                              type="text"
+                              className="form-control"
+                              name="spec_material"
+                              value={productForm.spec_material}
+                              onChange={handleProductInput}
+                            />
+                          </div>
+                          <div className="col-md-4">
+                            <label className="form-label">Dimensions</label>
+                            <input
+                              type="text"
+                              className="form-control"
+                              name="spec_dimensions"
+                              value={productForm.spec_dimensions}
+                              onChange={handleProductInput}
+                            />
+                          </div>
+                          <div className="col-md-4">
+                            <label className="form-label">Compatibility</label>
+                            <input
+                              type="text"
+                              className="form-control"
+                              name="spec_compatibility"
+                              value={productForm.spec_compatibility}
+                              onChange={handleProductInput}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="card mb-4 shadow-sm">
+                      <div className="card-header bg-light fw-bold">
+                        <i className="bi bi-check2-circle me-2 text-primary"></i>
+                        Availability & Warranty
+                      </div>
+                      <div className="card-body">
+                        <div className="row g-3">
+                          <div className="col-md-6">
+                            <label className="form-label">Availability</label>
+                            <input
+                              type="text"
+                              className="form-control"
+                              name="availability"
+                              value={productForm.availability}
+                              onChange={handleProductInput}
+                            />
+                          </div>
+                          <div className="col-md-6">
+                            <label className="form-label">Warranty</label>
+                            <input
+                              type="text"
+                              className="form-control"
+                              name="warranty"
+                              value={productForm.warranty}
+                              onChange={handleProductInput}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="text-end">
+                      <button
+                        type="submit"
+                        className="btn btn-primary btn-lg px-4"
+                      >
+                        <i className="bi bi-save me-2"></i>Save Product
                       </button>
                     </div>
                   </form>
