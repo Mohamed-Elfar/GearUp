@@ -12,7 +12,7 @@ export default function SplashPage() {
     // If already authenticated, redirect immediately based on role
     if (isAuthenticated && user) {
       console.log("User already authenticated:", user);
-      if (user.role === 'admin') {
+      if (user.role === "admin") {
         navigate("/admin");
       } else {
         navigate("/home");

@@ -1,6 +1,5 @@
 // src/components/RegisterModal/RegisterModal.jsx
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
@@ -8,7 +7,6 @@ import { useAuthStore } from "../../stores/authStore";
 
 export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
   const { t } = useTranslation();
-  const navigate = useNavigate();
   const { signUp } = useAuthStore();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -99,19 +97,12 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
       }
 
       if (data) {
-        if (data.session) {
-          // User is automatically logged in (email confirmation disabled)
-          alert("Registration successful! Welcome to GearUp!");
-          onClose();
-          navigate("/home/profile");
-        } else {
-          // Email confirmation required
-          alert(
-            "Registration successful! Please check your email to verify your account before logging in."
-          );
-          onClose();
-          // Don't navigate to profile since user needs to confirm email first
-        }
+        // Registration successful - redirect to login modal
+        alert(
+          "Registration successful! Please sign in with your credentials to access your account."
+        );
+        onClose(); // Close register modal
+        onSwitchToLogin(); // Open login modal
       }
       console.log("=== REGISTRATION DEBUG END ===");
     } catch (error) {

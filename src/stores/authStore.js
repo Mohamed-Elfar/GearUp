@@ -38,31 +38,24 @@ export const useAuthStore = create((set, get) => ({
       if (data.user) {
         console.log("User created:", data.user.id);
 
-        // Only create profile and set auth state if user is confirmed OR if we have a session
-        // If email confirmation is required, data.session will be null
-        if (data.session || data.user.email_confirmed_at) {
-          console.log(
-            "Creating user profile for confirmed user:",
-            data.user.id
-          );
-          await get().createUserProfile(data.user, userData);
+        // Create user profile but don't automatically log in after registration
+        // Users should explicitly sign in after registration
+        console.log("Creating user profile for new user:", data.user.id);
+        await get().createUserProfile(data.user, userData);
 
-          // Get the created user profile
-          const userProfile = await getCurrentUserProfile();
+        // Sign out the user to prevent automatic authentication
+        console.log(
+          "Signing out user after registration to require explicit login"
+        );
+        await supabase.auth.signOut();
 
-          // Update local auth state
-          set({
-            user: userProfile,
-            isAuthenticated: !!userProfile,
-            session: data.session,
-            authLoading: false,
-          });
-        } else {
-          console.log(
-            "Email confirmation required, profile will be created on first login"
-          );
-          set({ authLoading: false });
-        }
+        // Ensure local state is cleared
+        set({
+          user: null,
+          isAuthenticated: false,
+          session: null,
+          authLoading: false,
+        });
       } else {
         set({ authLoading: false });
       }
@@ -141,6 +134,9 @@ export const useAuthStore = create((set, get) => ({
           session: null,
           authLoading: false,
         });
+
+        // Redirect to home page after successful signout
+        window.location.href = "/home";
       }
 
       return { error };
@@ -151,31 +147,52 @@ export const useAuthStore = create((set, get) => ({
 
   createUserProfile: async (authUser, userData) => {
     try {
-      // For now, just create a basic user profile since we're collecting additional data in profile verification
+      console.log("Creating user profile for:", authUser.id);
+
+      // Use UPSERT to handle potential duplicates when email verification is disabled
       const { data: userProfile, error: userError } = await supabase
         .from("users")
-        .insert({
-          id: authUser.id,
-          role: userData.role,
-          first_name: userData.firstName,
-          last_name: userData.lastName,
-          email: userData.email,
-          // We'll collect phone_number and other details in profile verification
-        })
+        .upsert(
+          {
+            id: authUser.id,
+            role: userData.role,
+            first_name: userData.firstName,
+            last_name: userData.lastName,
+            email: userData.email,
+            // We'll collect phone_number and other details in profile verification
+          },
+          {
+            onConflict: "id", // Handle conflicts on the id field
+          }
+        )
         .select()
         .single();
 
-      if (userError) throw userError;
+      if (userError) {
+        console.error("Error upserting user profile:", userError);
+        throw userError;
+      }
+
+      console.log("User profile created/updated successfully:", userProfile);
 
       // Create basic role-specific records without detailed data
       if (userData.role === "customer") {
+        // Use UPSERT for customer record too
         const { error: customerError } = await supabase
           .from("customers")
-          .insert({
-            user_id: authUser.id,
-          });
+          .upsert(
+            {
+              user_id: authUser.id,
+            },
+            {
+              onConflict: "user_id",
+            }
+          );
 
-        if (customerError) throw customerError;
+        if (customerError) {
+          console.error("Error creating customer record:", customerError);
+          throw customerError;
+        }
       }
       // Note: We'll create seller and service_provider records during profile verification
       // when we have all the required data
@@ -191,14 +208,14 @@ export const useAuthStore = create((set, get) => ({
   needsProfileCompletion: () => {
     const { user } = get();
     console.log("needsProfileCompletion - checking user:", user);
-    
+
     if (!user) {
       console.log("needsProfileCompletion - no user found");
       return false;
     }
 
     // Admin users never need profile completion
-    if (user.role === 'admin') {
+    if (user.role === "admin") {
       console.log("needsProfileCompletion - admin user, no completion needed");
       return false;
     }
@@ -210,13 +227,19 @@ export const useAuthStore = create((set, get) => ({
     // For sellers and service providers, also check for ID card
     if (user.role === "seller" || user.role === "service_provider") {
       const needsCompletion = !hasBasicInfo || !user.id_card_image;
-      console.log("needsProfileCompletion - seller/service provider needs completion:", needsCompletion);
+      console.log(
+        "needsProfileCompletion - seller/service provider needs completion:",
+        needsCompletion
+      );
       return needsCompletion;
     }
 
     // For customers, only need basic info
     const needsCompletion = !hasBasicInfo;
-    console.log("needsProfileCompletion - customer needs completion:", needsCompletion);
+    console.log(
+      "needsProfileCompletion - customer needs completion:",
+      needsCompletion
+    );
     return needsCompletion;
   },
 
@@ -279,15 +302,15 @@ export const useAuthStore = create((set, get) => ({
         if (updates.latitude) roleSpecificFields.latitude = updates.latitude; // Fixed: use latitude not service_latitude
         if (updates.longitude) roleSpecificFields.longitude = updates.longitude; // Fixed: use longitude not service_longitude
         if (updates.specializations)
-          roleSpecificFields.specializations = updates.specializations;
+          roleSpecificFields.specialization = updates.specializations; // Fixed: database column is singular 'specialization'
         if (updates.business_license)
           roleSpecificFields.business_license = updates.business_license;
         if (updates.id_card_url)
           roleSpecificFields.id_card_url = updates.id_card_url;
       } else if (user.role === "customer") {
-        // For customers, store id_card in users table (if column exists) or create a separate customer_verifications table
+        // For customers, store id_card_url in the customers table
         if (updates.id_card_url)
-          basicUserFields.id_card_url = updates.id_card_url;
+          roleSpecificFields.id_card_url = updates.id_card_url;
       }
 
       // Update basic user information if there are any basic fields
@@ -311,7 +334,18 @@ export const useAuthStore = create((set, get) => ({
       // Update role-specific information
       if (Object.keys(roleSpecificFields).length > 0) {
         console.log("Updating role-specific fields:", roleSpecificFields);
-        if (user.role === "seller") {
+        if (user.role === "customer") {
+          // Create or update customer record
+          const { error: customerError } = await supabase.from("customers").upsert({
+            user_id: user.id,
+            ...roleSpecificFields,
+          });
+
+          if (customerError) {
+            console.error("Error updating customer fields:", customerError);
+            throw customerError;
+          }
+        } else if (user.role === "seller") {
           // Create or update seller record
           const { error: sellerError } = await supabase.from("sellers").upsert({
             user_id: user.id,
@@ -341,22 +375,26 @@ export const useAuthStore = create((set, get) => ({
         }
       }
 
-      // Create approval request for sellers and service providers
-      if (user.role === "seller" || user.role === "service_provider") {
-        console.log("Creating approval request...");
+      // Create approval request for all roles (customers, sellers, and service providers)
+      if (
+        user.role === "customer" ||
+        user.role === "seller" ||
+        user.role === "service_provider"
+      ) {
+        console.log("Creating approval request for role:", user.role);
         const { error: approvalError } = await supabase
           .from("approval_requests")
           .insert({
             user_id: user.id,
             role_requested: user.role,
-            status: "pending"
+            status: "pending",
           });
 
         if (approvalError) {
           console.error("Error creating approval request:", approvalError);
           // Don't throw error here, just log it as the profile update was successful
         } else {
-          console.log("Approval request created successfully");
+          console.log("Approval request created successfully for", user.role);
         }
       }
 
@@ -375,10 +413,10 @@ export const useAuthStore = create((set, get) => ({
   },
 
   // Get all pending approval requests (for admin use)
-  getApprovalRequests: async (status = 'pending') => {
+  getApprovalRequests: async (status = "pending") => {
     try {
       console.log("Fetching approval requests with status:", status);
-      
+
       // First, get the basic approval requests
       const { data: approvalData, error: approvalError } = await supabase
         .from("approval_requests")
@@ -405,28 +443,35 @@ export const useAuthStore = create((set, get) => ({
             // Fetch user data separately
             const { data: userData, error: userError } = await supabase
               .from("users")
-              .select("id, first_name, last_name, email, phone_number, created_at")
+              .select(
+                "id, first_name, last_name, email, phone_number, created_at"
+              )
               .eq("id", request.user_id)
               .single();
 
             if (userError) {
-              console.error(`Error fetching user ${request.user_id}:`, userError);
+              console.error(
+                `Error fetching user ${request.user_id}:`,
+                userError
+              );
               return request; // Return request without user data if user fetch fails
             }
 
             // Fetch role-specific data
             let roleData = null;
-            if (request.role_requested === 'seller') {
+            if (request.role_requested === "seller") {
               const { data: sellerData } = await supabase
                 .from("sellers")
-                .select("shop_name, shop_address, id_card_number, latitude, longitude")
+                .select(
+                  "shop_name, shop_address, id_card_number, latitude, longitude"
+                )
                 .eq("user_id", request.user_id)
                 .single();
               roleData = { sellers: sellerData };
-            } else if (request.role_requested === 'service_provider') {
+            } else if (request.role_requested === "service_provider") {
               const { data: serviceData } = await supabase
                 .from("service_providers")
-                .select("service_address, specializations, latitude, longitude")
+                .select("service_address, specialization, latitude, longitude")
                 .eq("user_id", request.user_id)
                 .single();
               roleData = { service_providers: serviceData };
@@ -435,7 +480,7 @@ export const useAuthStore = create((set, get) => ({
             return {
               ...request,
               users: userData,
-              ...roleData
+              ...roleData,
             };
           } catch (error) {
             console.error(`Error processing request ${request.id}:`, error);
@@ -461,7 +506,7 @@ export const useAuthStore = create((set, get) => ({
           status,
           reviewed_by: adminId,
           reviewed_at: new Date().toISOString(),
-          notes
+          notes,
         })
         .eq("id", requestId)
         .select()
@@ -475,21 +520,21 @@ export const useAuthStore = create((set, get) => ({
       // If approved, update the user's approval status in their role table
       if (status === "approved" && data) {
         const { user_id, role_requested } = data;
-        
+
         if (role_requested === "seller") {
           await supabase
             .from("sellers")
-            .update({ 
+            .update({
               is_approved: true,
-              approved_at: new Date().toISOString()
+              approved_at: new Date().toISOString(),
             })
             .eq("user_id", user_id);
         } else if (role_requested === "service_provider") {
           await supabase
             .from("service_providers")
-            .update({ 
+            .update({
               is_approved: true,
-              approved_at: new Date().toISOString()
+              approved_at: new Date().toISOString(),
             })
             .eq("user_id", user_id);
         }
@@ -526,17 +571,17 @@ export const useAuthStore = create((set, get) => ({
       if (user.role === "seller") {
         await supabase
           .from("sellers")
-          .update({ 
+          .update({
             is_approved: false,
-            approved_at: null
+            approved_at: null,
           })
           .eq("user_id", user.id);
       } else if (user.role === "service_provider") {
         await supabase
           .from("service_providers")
-          .update({ 
+          .update({
             is_approved: false,
-            approved_at: null
+            approved_at: null,
           })
           .eq("user_id", user.id);
       }
@@ -547,8 +592,8 @@ export const useAuthStore = create((set, get) => ({
           ...state.user,
           approval_status: null,
           approval_notes: null,
-          reviewed_at: null
-        }
+          reviewed_at: null,
+        },
       }));
 
       console.log("Approval status cleared successfully");
@@ -596,6 +641,34 @@ export const useAuthStore = create((set, get) => ({
     } catch (error) {
       console.error("Auth initialization error:", error);
       set({ authLoading: false });
+    }
+  },
+
+  // Refresh user profile data (useful after profile updates)
+  refreshUserProfile: async () => {
+    try {
+      const { user } = get();
+      if (!user) {
+        console.log("No user to refresh");
+        return { data: null, error: null };
+      }
+
+      console.log("Refreshing user profile for:", user.id);
+      const userProfile = await getCurrentUserProfile();
+
+      if (userProfile) {
+        set({
+          user: userProfile,
+        });
+        console.log("User profile refreshed successfully:", userProfile);
+        return { data: userProfile, error: null };
+      } else {
+        console.log("Failed to refresh user profile");
+        return { data: null, error: { message: "Failed to fetch updated profile" } };
+      }
+    } catch (error) {
+      console.error("Error refreshing user profile:", error);
+      return { data: null, error };
     }
   },
 

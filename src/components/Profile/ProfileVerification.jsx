@@ -12,16 +12,17 @@ import {
 
 export default function ProfileVerification() {
   const { t } = useTranslation();
-  const { user, updateProfile, isAuthenticated, authLoading } = useAuthStore();
+  const { user, updateProfile, refreshUserProfile, isAuthenticated, authLoading } = useAuthStore();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [uploadedFiles, setUploadedFiles] = useState({});
   const [isGettingLocation, setIsGettingLocation] = useState(false);
   const [locationError, setLocationError] = useState("");
   const [locationSuccess, setLocationSuccess] = useState(false);
   const [permissionStatus, setPermissionStatus] = useState("unknown"); // unknown, granted, denied, prompt
-  
+
   // Check if this is a reapplication
-  const isReapplication = new URLSearchParams(window.location.search).get('reapply') === 'true';
+  const isReapplication =
+    new URLSearchParams(window.location.search).get("reapply") === "true";
 
   // Check permission status on component mount
   useEffect(() => {
@@ -346,12 +347,21 @@ export default function ProfileVerification() {
           updateData.longitude = values.shopCoordinates.longitude;
         }
       } else if (userRole === "service_provider") {
-        updateData.specializations = values.specializations;
+        // Convert specializations array to a single string for database storage
+        updateData.specializations = Array.isArray(values.specializations)
+          ? values.specializations.join(", ")
+          : values.specializations;
         updateData.service_address = values.serviceAddress;
         // Add coordinates for map search functionality (after DB schema update)
         if (values.serviceCoordinates) {
           updateData.latitude = values.serviceCoordinates.latitude;
           updateData.longitude = values.serviceCoordinates.longitude;
+        }
+      } else if (userRole === "customer") {
+        // For customers, we only need to store the ID card reference
+        // The ID card file should be stored and referenced
+        if (uploadedFiles.idCard) {
+          updateData.id_card_url = uploadedFiles.idCard; // Store file reference
         }
       }
 
@@ -364,9 +374,21 @@ export default function ProfileVerification() {
         return;
       }
 
+      // Refresh user profile to get the updated approval status
+      console.log("Profile updated successfully, refreshing user data...");
+      const { error: refreshError } = await refreshUserProfile();
+      
+      if (refreshError) {
+        console.warn("Failed to refresh user profile:", refreshError);
+        // Don't block the success flow if refresh fails
+      }
+
       alert(
         "Profile verification submitted successfully! We'll review your documents within 24-48 hours."
       );
+
+      // The ProfilePage component will automatically show the pending approval status
+      // due to the refreshed user data containing the new approval_status
     } catch (error) {
       console.error("Profile verification error:", error);
       alert("Failed to submit profile verification. Please try again.");
@@ -402,7 +424,8 @@ export default function ProfileVerification() {
                     Resubmit Verification
                   </h2>
                   <p className="mb-0 opacity-75">
-                    Please update your information and documents based on the feedback provided
+                    Please update your information and documents based on the
+                    feedback provided
                   </p>
                 </>
               ) : (
@@ -423,15 +446,16 @@ export default function ProfileVerification() {
                     Resubmission Required
                   </h6>
                   <p className="mb-2">
-                    Your previous verification was not approved. Please review the feedback 
-                    and update your information accordingly.
+                    Your previous verification was not approved. Please review
+                    the feedback and update your information accordingly.
                   </p>
                   <small className="text-muted">
-                    <strong>Tip:</strong> Make sure all documents are clear, readable, and meet our requirements.
+                    <strong>Tip:</strong> Make sure all documents are clear,
+                    readable, and meet our requirements.
                   </small>
                 </div>
               )}
-              
+
               {/* Progress Indicator */}
               <div className="mb-4">
                 <div className="d-flex justify-content-between align-items-center mb-2">

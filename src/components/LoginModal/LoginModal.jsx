@@ -68,17 +68,22 @@ export default function LoginModal({ isOpen, onClose, onSwitchToRegister }) {
           const { user } = useAuthStore.getState();
           console.log("LoginModal - User after login:", user);
           console.log("LoginModal - User role:", user?.role);
-          console.log("LoginModal - Is admin?", user?.role === 'admin');
-          console.log("LoginModal - needsProfileCompletion():", needsProfileCompletion());
-          
+          console.log("LoginModal - Is admin?", user?.role === "admin");
+          console.log(
+            "LoginModal - needsProfileCompletion():",
+            needsProfileCompletion()
+          );
+
           // Admin users go directly to admin dashboard
-          if (user?.role === 'admin') {
+          if (user?.role === "admin") {
             console.log("Redirecting admin to admin dashboard");
             navigate("/admin");
           }
           // Check if user needs to complete profile
           else if (needsProfileCompletion()) {
-            console.log("User needs profile completion, redirecting to profile");
+            console.log(
+              "User needs profile completion, redirecting to profile"
+            );
             navigate("/home/profile");
           } else {
             console.log("User profile complete, redirecting to home");

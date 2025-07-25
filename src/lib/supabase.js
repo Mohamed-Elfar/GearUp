@@ -71,11 +71,20 @@ export const getCurrentUserProfile = async () => {
 
     console.log("Basic user profile fetched:", userProfile);
 
-    // Fetch approval status for sellers and service providers
+    // Fetch approval status for all user roles that require approval
     let approvalStatus = null;
-    if (userProfile.role === "seller" || userProfile.role === "service_provider") {
+    if (
+      userProfile.role === "customer" ||
+      userProfile.role === "seller" ||
+      userProfile.role === "service_provider"
+    ) {
       try {
-        console.log("Fetching approval status for user:", session.user.id, "role:", userProfile.role);
+        console.log(
+          "Fetching approval status for user:",
+          session.user.id,
+          "role:",
+          userProfile.role
+        );
         const { data: approvalData, error: approvalError } = await supabase
           .from("approval_requests")
           .select("status, reviewed_at, notes")
@@ -84,7 +93,7 @@ export const getCurrentUserProfile = async () => {
           .order("created_at", { ascending: false })
           .limit(1)
           .single();
-        
+
         if (approvalError) {
           console.log("Approval request error:", approvalError);
         } else {
@@ -92,7 +101,10 @@ export const getCurrentUserProfile = async () => {
           console.log("Approval status fetched successfully:", approvalStatus);
         }
       } catch (approvalError) {
-        console.log("No approval request found or error:", approvalError.message);
+        console.log(
+          "No approval request found or error:",
+          approvalError.message
+        );
       }
     }
 
@@ -106,6 +118,13 @@ export const getCurrentUserProfile = async () => {
           .eq("user_id", session.user.id)
           .single();
         userProfile.customers = customerData ? [customerData] : [];
+
+        // Add approval status to customer data
+        if (customerData && approvalStatus) {
+          userProfile.customers[0].approval_status = approvalStatus.status;
+          userProfile.customers[0].approval_notes = approvalStatus.notes;
+          userProfile.customers[0].reviewed_at = approvalStatus.reviewed_at;
+        }
       } else if (userProfile.role === "seller") {
         const { data: sellerData } = await supabase
           .from("sellers")
@@ -113,7 +132,7 @@ export const getCurrentUserProfile = async () => {
           .eq("user_id", session.user.id)
           .single();
         userProfile.sellers = sellerData ? [sellerData] : [];
-        
+
         // Add approval status to seller data
         if (sellerData && approvalStatus) {
           userProfile.sellers[0].approval_status = approvalStatus.status;
@@ -127,12 +146,15 @@ export const getCurrentUserProfile = async () => {
           .eq("user_id", session.user.id)
           .single();
         userProfile.service_providers = serviceData ? [serviceData] : [];
-        
+
         // Add approval status to service provider data
         if (serviceData && approvalStatus) {
-          userProfile.service_providers[0].approval_status = approvalStatus.status;
-          userProfile.service_providers[0].approval_notes = approvalStatus.notes;
-          userProfile.service_providers[0].reviewed_at = approvalStatus.reviewed_at;
+          userProfile.service_providers[0].approval_status =
+            approvalStatus.status;
+          userProfile.service_providers[0].approval_notes =
+            approvalStatus.notes;
+          userProfile.service_providers[0].reviewed_at =
+            approvalStatus.reviewed_at;
         }
       }
     } catch (roleError) {
@@ -148,10 +170,12 @@ export const getCurrentUserProfile = async () => {
       console.log("Added approval status to user profile:", {
         approval_status: userProfile.approval_status,
         approval_notes: userProfile.approval_notes,
-        reviewed_at: userProfile.reviewed_at
+        reviewed_at: userProfile.reviewed_at,
       });
     } else {
-      console.log("No approval status found - user might not have submitted for approval yet");
+      console.log(
+        "No approval status found - user might not have submitted for approval yet"
+      );
     }
 
     console.log("Final user profile with approval status:", userProfile);

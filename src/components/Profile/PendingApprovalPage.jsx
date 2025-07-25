@@ -31,8 +31,9 @@ export default function PendingApprovalPage({ user }) {
                 </div>
                 <h3>Your verification is being reviewed</h3>
                 <p className="text-muted mb-4">
-                  Thank you for submitting your {user?.role?.replace('_', ' ')} verification request. 
-                  Our admin team is currently reviewing your information and documents.
+                  Thank you for submitting your {user?.role?.replace("_", " ")}{" "}
+                  verification request. Our admin team is currently reviewing
+                  your information and documents.
                 </p>
               </div>
 
@@ -76,14 +77,14 @@ export default function PendingApprovalPage({ user }) {
               </div>
 
               <div className="mt-4">
-                <button 
+                <button
                   className="btn btn-outline-primary me-3"
-                  onClick={() => window.location.href = "/home"}
+                  onClick={() => (window.location.href = "/home")}
                 >
                   <i className="bi bi-house me-2"></i>
                   Go to Dashboard
                 </button>
-                <button 
+                <button
                   className="btn btn-outline-secondary"
                   onClick={() => window.location.reload()}
                 >

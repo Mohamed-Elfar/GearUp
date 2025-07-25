@@ -10,10 +10,11 @@ export default function RejectedApprovalPage({ user }) {
   useEffect(() => {
     if (user?.approval_notes) {
       // Create and show toast notification
-      const toast = document.createElement('div');
-      toast.className = 'toast align-items-center text-white bg-danger border-0 position-fixed';
-      toast.style.cssText = 'top: 20px; right: 20px; z-index: 1055;';
-      toast.setAttribute('role', 'alert');
+      const toast = document.createElement("div");
+      toast.className =
+        "toast align-items-center text-white bg-danger border-0 position-fixed";
+      toast.style.cssText = "top: 20px; right: 20px; z-index: 1055;";
+      toast.setAttribute("role", "alert");
       toast.innerHTML = `
         <div class="d-flex">
           <div class="toast-body">
@@ -23,15 +24,15 @@ export default function RejectedApprovalPage({ user }) {
           <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
         </div>
       `;
-      
+
       document.body.appendChild(toast);
-      
+
       // Initialize and show toast using Bootstrap
       const bootstrapToast = new window.bootstrap.Toast(toast, {
-        autohide: false // Keep it visible until user dismisses
+        autohide: false, // Keep it visible until user dismisses
       });
       bootstrapToast.show();
-      
+
       // Cleanup function
       return () => {
         if (document.body.contains(toast)) {
@@ -45,24 +46,25 @@ export default function RejectedApprovalPage({ user }) {
     setIsReapplying(true);
     try {
       console.log("Starting reapplication process...");
-      
+
       // Clear the rejection status and allow user to resubmit
       const { error } = await clearApprovalForReapplication();
-      
+
       if (error) {
         console.error("Error clearing approval status:", error);
         alert("Failed to start reapplication. Please try again.");
         setIsReapplying(false);
         return;
       }
-      
-      console.log("Approval status cleared, redirecting to verification form...");
-      
+
+      console.log(
+        "Approval status cleared, redirecting to verification form..."
+      );
+
       // Small delay to ensure state is updated, then redirect
       setTimeout(() => {
         window.location.reload(); // This will reload and show verification form
       }, 500);
-      
     } catch (error) {
       console.error("Error during reapplication:", error);
       alert("Failed to start reapplication. Please try again.");
@@ -94,11 +96,15 @@ export default function RejectedApprovalPage({ user }) {
             </div>
             <div className="card-body text-center p-5">
               <div className="mb-4">
-                <i className="bi bi-exclamation-triangle text-danger mb-3" style={{fontSize: '3rem'}}></i>
+                <i
+                  className="bi bi-exclamation-triangle text-danger mb-3"
+                  style={{ fontSize: "3rem" }}
+                ></i>
                 <h3>Your verification was not approved</h3>
                 <p className="text-muted mb-4">
-                  Unfortunately, your {user?.role?.replace('_', ' ')} verification request 
-                  could not be approved at this time. Please review the feedback below and resubmit.
+                  Unfortunately, your {user?.role?.replace("_", " ")}{" "}
+                  verification request could not be approved at this time.
+                  Please review the feedback below and resubmit.
                 </p>
               </div>
 
@@ -152,14 +158,17 @@ export default function RejectedApprovalPage({ user }) {
               </div>
 
               <div className="d-flex gap-3 justify-content-center">
-                <button 
+                <button
                   className="btn btn-primary btn-lg"
                   onClick={handleReapply}
                   disabled={isReapplying}
                 >
                   {isReapplying ? (
                     <>
-                      <span className="spinner-border spinner-border-sm me-2" role="status"></span>
+                      <span
+                        className="spinner-border spinner-border-sm me-2"
+                        role="status"
+                      ></span>
                       Processing...
                     </>
                   ) : (
@@ -169,9 +178,9 @@ export default function RejectedApprovalPage({ user }) {
                     </>
                   )}
                 </button>
-                <button 
+                <button
                   className="btn btn-outline-secondary"
-                  onClick={() => window.location.href = "/home"}
+                  onClick={() => (window.location.href = "/home")}
                   disabled={isReapplying}
                 >
                   <i className="bi bi-house me-2"></i>

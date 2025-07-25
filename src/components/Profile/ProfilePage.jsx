@@ -12,14 +12,14 @@ export default function ProfilePage() {
   // Debug: Log user data to see what's happening
   console.log("ProfilePage - Current user:", user);
   console.log("ProfilePage - User role:", user?.role);
-  console.log("ProfilePage - Is admin?", user?.role === 'admin');
+  console.log("ProfilePage - Is admin?", user?.role === "admin");
   console.log("ProfilePage - Approval status:", user?.approval_status);
   console.log("ProfilePage - Phone number:", user?.phone_number);
   console.log("ProfilePage - ID card:", user?.id_card_image);
   console.log("ProfilePage - Full user object:", JSON.stringify(user, null, 2));
 
   // Admin users don't need profile verification
-  if (user?.role === 'admin') {
+  if (user?.role === "admin") {
     return (
       <div className="container py-5">
         <div className="row justify-content-center">
@@ -33,7 +33,10 @@ export default function ProfilePage() {
               </div>
               <div className="card-body text-center p-5">
                 <h3>Welcome, Administrator!</h3>
-                <p className="text-muted mb-4">Access your admin tools to manage user approvals and system oversight.</p>
+                <p className="text-muted mb-4">
+                  Access your admin tools to manage user approvals and system
+                  oversight.
+                </p>
                 <div className="d-flex gap-3 justify-content-center">
                   <a href="/admin" className="btn btn-primary btn-lg">
                     <i className="bi bi-people me-2"></i>
@@ -60,53 +63,100 @@ export default function ProfilePage() {
     console.log("Processing seller/service provider logic");
     console.log("needsProfileCompletion:", needsProfileCompletion);
     console.log("user.approval_status:", user?.approval_status);
-    
+
     // If basic profile is incomplete, show verification form
     if (needsProfileCompletion) {
       console.log("Showing verification form - basic profile incomplete");
       return <ProfileVerification />;
     }
-    
+
     // If basic profile is complete, check for business verification
-    const needsIdVerification = !user?.id_card_image || 
+    const needsIdVerification =
+      !user?.id_card_image ||
       (user?.role === "seller" && !user?.id_card_number);
-    
+
     console.log("needsIdVerification:", needsIdVerification);
-    
+
     // If business verification is incomplete AND no approval status, show verification form
     if (needsIdVerification && !user?.approval_status) {
-      console.log("Showing verification form - business verification incomplete and no approval status");
+      console.log(
+        "Showing verification form - business verification incomplete and no approval status"
+      );
       return <ProfileVerification />;
     }
-    
+
     // Handle approval statuses - regardless of verification completion
     if (user?.approval_status === "pending") {
       console.log("Showing pending approval page");
       return <PendingApprovalPage user={user} />;
     }
-    
+
     if (user?.approval_status === "rejected") {
       console.log("Showing rejected approval page");
       return <RejectedApprovalPage user={user} />;
     }
-    
+
     // If approved, show normal profile even if some verification is missing
     if (user?.approval_status === "approved") {
       console.log("User approved - showing normal profile");
       // Continue to normal profile page
     }
-    
+
     // If no approval status but verification complete, show normal profile
     // If no approval status and verification incomplete, user needs to complete verification
     if (!user?.approval_status && needsIdVerification) {
-      console.log("No approval status and verification incomplete - showing verification form");
+      console.log(
+        "No approval status and verification incomplete - showing verification form"
+      );
       return <ProfileVerification />;
     }
-    
-  } else {
-    // For customers, only check basic profile completion
+  } else if (user?.role === "customer") {
+    // For customers, check approval status after profile completion
+    console.log("Processing customer logic");
+    console.log("needsProfileCompletion:", needsProfileCompletion);
+    console.log("user.approval_status:", user?.approval_status);
+
+    // If basic profile is incomplete, show verification form
     if (needsProfileCompletion) {
       console.log("Customer needs profile completion");
+      return <ProfileVerification />;
+    }
+
+    // Check if customer needs verification documents
+    const needsIdVerification = !user?.customers?.[0]?.id_card_url;
+    console.log("needsIdVerification:", needsIdVerification);
+    console.log("customer data:", user?.customers?.[0]);
+
+    // If verification is incomplete AND no approval status, show verification form
+    if (needsIdVerification && !user?.approval_status) {
+      console.log(
+        "Showing verification form - customer verification incomplete and no approval status"
+      );
+      return <ProfileVerification />;
+    }
+
+    // Handle approval statuses for customers
+    if (user?.approval_status === "pending") {
+      console.log("Showing pending approval page for customer");
+      return <PendingApprovalPage user={user} />;
+    }
+
+    if (user?.approval_status === "rejected") {
+      console.log("Showing rejected approval page for customer");
+      return <RejectedApprovalPage user={user} />;
+    }
+
+    // If approved, show normal profile page
+    if (user?.approval_status === "approved") {
+      console.log("Customer approved - showing profile page");
+      // Continue to normal profile page below
+    }
+
+    // If no approval status and verification incomplete, show verification form
+    if (!user?.approval_status && needsIdVerification) {
+      console.log(
+        "No approval status and verification incomplete - showing verification form for customer"
+      );
       return <ProfileVerification />;
     }
   }
@@ -175,26 +225,32 @@ export default function ProfilePage() {
                       Rejected
                     </span>
                   )}
-                  {!user?.approval_status && (user?.role === "customer") && (
+                  {!user?.approval_status && user?.role === "customer" && (
                     <span className="badge bg-primary">
                       <i className="bi bi-check-circle me-1"></i>
                       Verified
                     </span>
                   )}
-                  {!user?.approval_status && (user?.role === "seller" || user?.role === "service_provider") && (
-                    <span className="badge bg-secondary">
-                      <i className="bi bi-info-circle me-1"></i>
-                      Complete Profile to Get Verified
-                    </span>
-                  )}
+                  {!user?.approval_status &&
+                    (user?.role === "seller" ||
+                      user?.role === "service_provider") && (
+                      <span className="badge bg-secondary">
+                        <i className="bi bi-info-circle me-1"></i>
+                        Complete Profile to Get Verified
+                      </span>
+                    )}
                 </div>
-                
+
                 {/* Show additional approval information */}
                 {user?.approval_status && user?.reviewed_at && (
                   <div className="mt-2">
                     <small className="text-muted">
-                      {user.approval_status === "approved" ? "Approved" : 
-                       user.approval_status === "rejected" ? "Rejected" : "Submitted"} on{" "}
+                      {user.approval_status === "approved"
+                        ? "Approved"
+                        : user.approval_status === "rejected"
+                        ? "Rejected"
+                        : "Submitted"}{" "}
+                      on{" "}
                       {new Date(user.reviewed_at).toLocaleDateString("en-US", {
                         year: "numeric",
                         month: "long",
@@ -203,15 +259,16 @@ export default function ProfilePage() {
                     </small>
                   </div>
                 )}
-                
+
                 {/* Show rejection notes if applicable */}
-                {user?.approval_status === "rejected" && user?.approval_notes && (
-                  <div className="alert alert-danger mt-2" role="alert">
-                    <small>
-                      <strong>Rejection Reason:</strong> {user.approval_notes}
-                    </small>
-                  </div>
-                )}
+                {user?.approval_status === "rejected" &&
+                  user?.approval_notes && (
+                    <div className="alert alert-danger mt-2" role="alert">
+                      <small>
+                        <strong>Rejection Reason:</strong> {user.approval_notes}
+                      </small>
+                    </div>
+                  )}
               </div>
 
               {/* Business Info for Sellers/Service Providers */}
@@ -269,9 +326,11 @@ export default function ProfilePage() {
                   Edit Profile
                 </button>
                 {user?.approval_status === "rejected" && (
-                  <button 
+                  <button
                     className="btn btn-warning"
-                    onClick={() => window.location.href = "/home/profile?reapply=true"}
+                    onClick={() =>
+                      (window.location.href = "/home/profile?reapply=true")
+                    }
                   >
                     <i className="bi bi-arrow-clockwise me-2"></i>
                     Reapply for Verification
